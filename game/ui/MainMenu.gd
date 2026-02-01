@@ -57,7 +57,7 @@ func _on_new_game_button_pressed() -> void:
 	_busy = true
 	_set_buttons_enabled(false)
 	await _play_confirm_and_wait()
-	get_tree().change_scene_to_file(new_game_scene)
+	SceneManager.start_new_game(new_game_scene)
 
 
 func _on_load_game_button_pressed() -> void:
@@ -99,4 +99,4 @@ func _on_quit_button_pressed() -> void:
 	_busy = true
 	_set_buttons_enabled(false)
 	await _play_confirm_and_wait()
-	get_tree().quit()
+	SceneManager.quit_game()

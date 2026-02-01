@@ -5,24 +5,22 @@ class_name PlayerInput
 @export var action_left: StringName = &"left"
 @export var action_right: StringName = &"right"
 @export var action_run: StringName = &"run"
+@export var action_up: StringName = &"up" 
 @export var action_down: StringName = &"down"
 @export var action_glide: StringName = &"ui_rs"
 @export var action_jump: StringName = &"jump"
-@export var action_attack: StringName = &"attack" # <-- novo
+@export var action_attack: StringName = &"attack"
 
 class Snapshot:
 	var axis: int = 0
 	var run_held: bool = false
-
+	var up_held: bool = false
 	var down_held: bool = false
-	var down_pressed: bool = false # <-- novo (apertou agora)
-
+	var down_pressed: bool = false
 	var glide_held: bool = false
-
 	var jump_released: bool = false
 	var jump_buffered: bool = false
-
-	var attack_pressed: bool = false # <-- novo (apertou agora)
+	var attack_pressed: bool = false
 
 var snapshot := Snapshot.new()
 
@@ -41,22 +39,19 @@ func poll() -> void:
 	snapshot.axis = int(signf(a))
 
 	snapshot.run_held = Input.is_action_pressed(action_run)
-
+	snapshot.up_held = Input.is_action_pressed(action_up)
 	snapshot.down_held = Input.is_action_pressed(action_down)
 	snapshot.down_pressed = Input.is_action_just_pressed(action_down)
 
 	snapshot.glide_held = Input.is_action_pressed(action_glide)
-
 	snapshot.attack_pressed = Input.is_action_just_pressed(action_attack)
-
 	snapshot.jump_released = Input.is_action_just_released(action_jump)
 
 	var pressed := Input.is_action_just_pressed(action_jump)
 	if pressed:
 		_jump_buffer_ticks_left = 1 if _jump_buffer_ticks_max <= 0 else _jump_buffer_ticks_max
-	else:
-		if _jump_buffer_ticks_left > 0:
-			_jump_buffer_ticks_left -= 1
+	elif _jump_buffer_ticks_left > 0:
+		_jump_buffer_ticks_left -= 1
 
 	snapshot.jump_buffered = _jump_buffer_ticks_left > 0
 

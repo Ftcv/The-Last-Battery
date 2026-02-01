@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://cx3iqyjypktfn"]
+[gd_scene format=3 uid="uid://cx3iqyjypktfn"]
 
 [ext_resource type="Texture2D" uid="uid://y517o2s45rw5" path="res://icon.png" id="1_bdee1"]
 [ext_resource type="Script" uid="uid://d12eau28xh2qu" path="res://game/world/checkpoints/Checkpoint.gd" id="1_tclm3"]
@@ -6,17 +6,17 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tclm3"]
 size = Vector2(29, 62)
 
-[node name="Checkpoint" type="Area2D"]
+[node name="Checkpoint" type="Area2D" unique_id=1714773606]
 collision_layer = 32
 collision_mask = 2
 script = ExtResource("1_tclm3")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1098426068]
 modulate = Color(0.36, 0.36, 0.36, 1)
 position = Vector2(0.5, 0)
 scale = Vector2(0.421875, 1)
 texture = ExtResource("1_bdee1")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=340593325]
 position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_tclm3")
