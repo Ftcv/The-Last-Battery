@@ -1,7 +1,7 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1769991809
+::res://::1770232432
 default_bus_layout.tres::AudioBusLayout::321246895729976081::1768653982::0::1::::<><><>0<>0<><>::
-default_env.tres::Environment::3563669176288526195::1769991809::0::1::::<><><>0<>0<><>::
+default_env.tres::Environment::3563669176288526195::1770068896::0::1::::<><><>0<>0<><>::
 icon.png::CompressedTexture2D/CompressedTexture2D::1748100145045867406::1766788188::1766788188::1::::<><><>0<>0<>a5b1a24ca51a0dfab6a0ce1c6cf355c6<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
 playericon.png::CompressedTexture2D/CompressedTexture2D::3265391844454269755::1766788188::1766788188::1::::<><><>0<>0<>59b8db4fb56504d6ed6a4bcb63a8e423<>res://.godot/imported/playericon.png-4fcd3f09d136717904a5507b8fd74fbe.ctex::
 ::res://addons/::1767059259
@@ -13,7 +13,7 @@ Respirando.tres::Animation::-1::1766788188::0::1::::<><><>0<>0<><>::
 ::res://assets/audio/sfx/::1768518383
 ui_accept.wav::AudioStreamWAV::1327487366706845138::1768518383::1768518357::1::::<><><>0<>0<>18fecb2afdf4989e51b04e7c0b3718bf<>res://.godot/imported/ui_accept.wav-cc1d412e6d84623b4fc9863737cbff74.sample::
 ui_select.wav::AudioStreamWAV::6372018036070633418::1768518357::1768518357::1::::<><><>0<>0<>6268ece91474fb349531ef0e7d477a44<>res://.godot/imported/ui_select.wav-d70ac7a88c51f2b31630dac3382b4179.sample::
-::res://assets/imagens/::1769375018
+::res://assets/imagens/::1769991939
 Playersprite.png::CompressedTexture2D::688537113059089189::1769991934::1769991939::1::::<><><>0<>0<>48846072652381b5708b2cb989b75960<>res://.godot/imported/Playersprite.png-6ec43507fef915d63767f7168b645940.ctex::
 SOFRIDO.png::CompressedTexture2D::8905808492964789603::1766788188::1767059293::1::::<><><>0<>0<>d99afc0f8fb9411dff8b8e7c83d6f6c7<>res://.godot/imported/SOFRIDO.png-0f7f1f286c15394fae6ee58f80c8bdfd.ctex::
 Tileset_atlas_template.png::CompressedTexture2D::8746643789252515223::1766788188::1767059293::1::::<><><>0<>0<>4f5b47834dba8107480b6f94ea659377<>res://.godot/imported/Tileset_atlas_template.png-679b35e1030617f074bf5daadfae3a26.ctex::

@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="PlayerStats" load_steps=2 format=3 uid="uid://dxye4646gc0qf"]
+[gd_resource type="Resource" script_class="PlayerStats" format=3 uid="uid://dxye4646gc0qf"]
 
 [ext_resource type="Script" uid="uid://b5y4v3at8f2kd" path="res://game/player/player_stats.gd" id="1_egfi8"]
 
 [resource]
 script = ExtResource("1_egfi8")
 max_walk_speed = 150.0
-max_run_speed = 250.0
+max_run_speed = 220.0
 acceleration = 40.0
 stop_threshold = 2.0
 gravity = 9.0
 glide_open_brake = 30.0
+wall_jump_lock_seconds = 0.3
 metadata/_custom_type_script = "uid://b5y4v3at8f2kd"

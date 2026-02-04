@@ -328,3 +328,24 @@ position = Vector2(564, -59)
 
 [node name="DevReload" type="Node" parent="." unique_id=1079212922]
 script = ExtResource("8_js7ko")
+
+[node name="SimpleEnemy3" parent="." unique_id=2107262191 instance=ExtResource("6_js7ko")]
+position = Vector2(-613, -58)
+
+[node name="SimpleEnemy4" parent="." unique_id=839788847 instance=ExtResource("6_js7ko")]
+position = Vector2(-780, -51)
+
+[node name="SimpleEnemy5" parent="." unique_id=2144738926 instance=ExtResource("6_js7ko")]
+position = Vector2(-422, -54)
+
+[node name="SimpleEnemy6" parent="." unique_id=1112913633 instance=ExtResource("6_js7ko")]
+position = Vector2(-922, -58)
+
+[node name="SimpleEnemy7" parent="." unique_id=552257663 instance=ExtResource("6_js7ko")]
+position = Vector2(-707, -58)
+
+[node name="SimpleEnemy8" parent="." unique_id=1367780222 instance=ExtResource("6_js7ko")]
+position = Vector2(-531, -53)
+
+[node name="SimpleEnemy9" parent="." unique_id=1586308361 instance=ExtResource("6_js7ko")]
+position = Vector2(-359, -57)

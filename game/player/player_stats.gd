@@ -3,7 +3,7 @@ extends Resource
 class_name PlayerStats
 
 @export_group("Snap")
-@export var floor_snap_length: float = 7.0
+@export var floor_snap_length: float = 8.0
 
 @export_group("Movimento - chão")
 @export var max_walk_speed: float = 200.0
@@ -40,18 +40,31 @@ class_name PlayerStats
 @export var slide_acceleration: float = 0.5
 @export var slope_threshold: float = 0.2 # rad
 
-@export_group("Crouch / Ground Pound")
+@export_group("Crouch")
 @export var crouch_speed_cap: float = 120.0
+
+@export_group("Ground Pound")
 @export var ground_pound_start_speed: float = 250.0
 @export var ground_pound_max_speed: float = 520.0
 @export var ground_pound_gravity_multiplier: float = 2.0
+@export var ground_pound_land_seconds: float = 0.16
 
-@export_group("Wall")
+@export_group("Wall Action")
 @export var max_wall_slide_speed: float = 120.0
 @export var wall_slide_gravity_divisor: float = 2.5
 @export var wall_jump_y: float = -240.0
 @export var wall_jump_x: float = 220.0
 @export var wall_jump_lock_seconds: float = 0.10
+
+@export_group("Cartwheel / Attack")
+@export var attack_start_speed: float = 260.0
+@export var attack_base_max_speed: float = 450.0 # Velocidade normal do rolamento (sem boost)
+@export var attack_seconds: float = 0.40
+@export var attack_extend_seconds_on_hit: float = 0.35
+@export var attack_speed_boost_add: float = 120.0 # Adiciona isso a cada hit (Acumulativo)
+@export var attack_friction: float = 0.04 # Fricção normal
+@export var attack_overspeed_friction: float = 0.01 # Fricção MUITO baixa quando estiver boostado (Coasting)
+@export var attack_allow_start_still: bool = true
 
 @export_group("HP / Dano")
 @export var max_hp: int = 3

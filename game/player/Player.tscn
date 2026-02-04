@@ -307,8 +307,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_38lxl"]
-height = 25.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_38lxl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o4naa"]
 size = Vector2(12, 29.5)
@@ -325,11 +324,11 @@ stats = ExtResource("2_38lxl")
 texture_filter = 1
 position = Vector2(1, -16)
 sprite_frames = SubResource("SpriteFrames_8cf8e")
-animation = &"attack"
+animation = &"crouch"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1387931372]
 position = Vector2(1, -13)
-shape = SubResource("CapsuleShape2D_38lxl")
+shape = SubResource("RectangleShape2D_38lxl")
 
 [node name="CoyoteTimer" type="Timer" parent="." unique_id=1229478610]
 wait_time = 0.1

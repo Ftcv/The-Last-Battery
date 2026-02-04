@@ -14,7 +14,7 @@ enum State {
 	GROUND_POUND,
 	GROUND_POUND_LAND,
 	CARTWHEEL,
-	WALL_SLIDE, # <-- NOVO ESTADO
+	WALL_SLIDE,
 	MACHUCADO,
 	MORTO
 }
@@ -24,34 +24,12 @@ enum State {
 @export var stats: PlayerStats
 @export var attack_action: StringName = &"attack"
 
-@export_group("HP (MVP)")
-@export var max_hp: int = 3
-@export var invuln_seconds: float = 0.60
-@export var hurt_lock_seconds: float = 0.25
-@export var knockback_x: float = 220.0
-@export var knockback_y: float = -170.0
-
-@export_group("Ground Pound (MVP)")
-@export var ground_pound_start_speed: float = 250.0
-@export var ground_pound_max_speed: float = 520.0
-@export var ground_pound_gravity_multiplier: float = 2.0
-@export var ground_pound_land_seconds: float = 0.16
-
-@export_group("Crouch (MVP)")
-@export var crouch_speed_cap: float = 120.0
-
-@export_group("Cartwheel / Attack (MVP - DKC-like)")
-@export var attack_start_speed: float = 260.0
-@export var attack_max_speed: float = 520.0
-@export var attack_seconds: float = 0.40
-@export var attack_extend_seconds_on_hit: float = 0.40
-@export var attack_speed_boost_on_hit: float = 90.0
-@export var attack_friction: float = 0.04
-@export var attack_allow_start_still: bool = true
-
-@export_group("Attack Hitbox Placement")
+@export_group("Scene Config")
 @export var attack_hitbox_offset_x: float = 14.0
 @export var attack_hitbox_offset_y: float = 0.0
+
+@export_group("Tuning Fino (Local)")
+@export var gp_hold_threshold: float = 0.12 # Tempo segurando BAIXO para ativar GP
 
 @onready var coyote_jump_timer: Timer = get_node_or_null("CoyoteTimer")
 @onready var anim_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D")
@@ -64,9 +42,7 @@ var hp: int = 0
 
 var _invuln_left: float = 0.0
 var _hurt_left: float = 0.0
-
-# Variável de controle para o Wall Jump (Lock de input)
-var _wall_jump_lock_left: float = 0.0 
+var _wall_jump_lock_left: float = 0.0
 
 var _is_running: bool = false
 var _slide_speed: float = 0.0
@@ -75,7 +51,9 @@ var _facing: int = 1
 var _was_on_floor: bool = false
 var _down_was_held: bool = false
 
+# Timers
 var _gp_land_left: float = 0.0
+var _gp_hold_timer: float = 0.0 # Acumulador para evitar GP acidental
 
 var _attack_left: float = 0.0
 var _attack_dir: int = 1
@@ -83,7 +61,7 @@ var _cartwheel_air_jump_charges: int = 0
 
 var _ok: bool = true
 
-# --- API pequena para a câmera (modular, sem acoplamento no enum) ---
+# --- API ---
 func is_crouching() -> bool:
 	return state == State.AGACHADO
 
@@ -98,19 +76,9 @@ func _ready() -> void:
 
 func _validate_and_init() -> bool:
 	if stats == null:
-		push_warning("Player.stats está vazio. Atribua um PlayerStats .tres no Inspector.")
-		stats = PlayerStats.new()
+		stats = PlayerStats.new() # Fallback
 
-	if coyote_jump_timer == null:
-		push_error("Faltando Timer 'CoyoteTimer' como child do Player.")
-		return false
-
-	if anim_sprite == null:
-		push_error("Faltando AnimatedSprite2D 'AnimatedSprite2D' como child do Player.")
-		return false
-
-	if player_input == null:
-		push_error("Faltando PlayerInput 'PlayerInput' como child do Player.")
+	if coyote_jump_timer == null or anim_sprite == null or player_input == null:
 		return false
 
 	floor_snap_length = stats.floor_snap_length
@@ -124,7 +92,7 @@ func _validate_and_init() -> bool:
 	_slide_speed = stats.slide_speed_start
 	_was_on_floor = is_on_floor()
 
-	hp = max_hp
+	hp = stats.max_hp
 	is_alive = true
 
 	_setup_attack_hitbox()
@@ -138,12 +106,9 @@ func _validate_and_init() -> bool:
 	return true
 
 func _setup_attack_hitbox() -> void:
-	if attack_hitbox == null:
-		push_warning("Sem 'AttackHitbox' (Area2D). O CARTWHEEL não vai acertar inimigos.")
-		return
-
+	if attack_hitbox == null: return
 	attack_hitbox.monitoring = false
-
+	
 	var cb_body := Callable(self, "_on_attack_body_entered")
 	if not attack_hitbox.body_entered.is_connected(cb_body):
 		attack_hitbox.body_entered.connect(cb_body)
@@ -153,18 +118,11 @@ func _setup_attack_hitbox() -> void:
 		attack_hitbox.area_entered.connect(cb_area)
 
 func _physics_process(delta: float) -> void:
-	if not _ok:
-		return
+	if not _ok: return
 
 	var dt_ticks := delta * float(Engine.physics_ticks_per_second)
 
-	_tick_damage_timers(delta)
-	_tick_ground_pound_land(delta)
-	_tick_attack_timer(delta)
-	
-	# Tick do input lock do Wall Jump
-	if _wall_jump_lock_left > 0.0:
-		_wall_jump_lock_left -= delta
+	_tick_timers(delta)
 
 	if state == State.MORTO:
 		_apply_gravity(dt_ticks)
@@ -177,12 +135,12 @@ func _physics_process(delta: float) -> void:
 
 	var down_pressed := input.down_held and not _down_was_held
 	_down_was_held = input.down_held
-
 	var attack_pressed := input.attack_pressed
 
 	_update_facing(input.axis)
 	_update_run_latch(input)
-	_update_state(input, down_pressed, attack_pressed)
+	
+	_update_state(input, down_pressed, attack_pressed, delta)
 
 	match state:
 		State.DESLIZANDO:
@@ -196,18 +154,17 @@ func _physics_process(delta: float) -> void:
 		State.GROUND_POUND:
 			_apply_ground_pound(dt_ticks)
 		State.GROUND_POUND_LAND:
-			_apply_land_lock(dt_ticks)
+			_apply_land_lock(dt_ticks, input)
 		State.CARTWHEEL:
 			_apply_cartwheel(dt_ticks)
 		State.WALL_SLIDE:
-			_apply_wall_slide(dt_ticks, input) # <-- Lógica nova
+			_apply_wall_slide(dt_ticks, input)
 		_:
 			_apply_walk(dt_ticks, input)
 
 	_apply_jump_logic_cartwheel_aware()
 
 	if input.jump_released and velocity.y < 0.0:
-		# Só corta pulo se não estiver no lock do Wall Jump (opcional, mas comum em platformers precisos)
 		if _wall_jump_lock_left <= 0.0:
 			velocity.y *= stats.jump_cut_multiplier
 
@@ -215,66 +172,42 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_post_move()
 	_play_animations()
-
+	
 	if debug_print:
-		print("vel:", velocity,
-			" state:", state,
-			" on_floor:", is_on_floor(),
-			" gp_land:", _gp_land_left,
-			" atk_left:", _attack_left,
-			" hp:", hp, "/", max_hp
-		)
+		print("State: ", State.keys()[state], " VelX: ", int(velocity.x))
 
-func _tick_damage_timers(delta: float) -> void:
+func _tick_timers(delta: float) -> void:
 	if _invuln_left > 0.0:
 		_invuln_left = maxf(0.0, _invuln_left - delta)
-
 	if _hurt_left > 0.0:
 		_hurt_left = maxf(0.0, _hurt_left - delta)
 		if _hurt_left <= 0.0 and state == State.MACHUCADO:
-			if is_on_floor():
-				set_state(State.IDLE)
-			else:
-				set_state(State.CAINDO)
+			set_state(State.IDLE if is_on_floor() else State.CAINDO)
 
-func _tick_ground_pound_land(delta: float) -> void:
-	if _gp_land_left <= 0.0:
-		return
-	_gp_land_left = maxf(0.0, _gp_land_left - delta)
-	if _gp_land_left <= 0.0 and state == State.GROUND_POUND_LAND:
-		player_input.poll()
-		var i := player_input.snapshot
-		if i.down_held:
-			set_state(State.AGACHADO)
-		else:
-			set_state(State.ANDANDO if absf(velocity.x) > 0.1 else State.IDLE)
+	# Timer do Ground Pound Land (Trava de aterrissagem)
+	if state == State.GROUND_POUND_LAND:
+		if _gp_land_left > 0.0:
+			_gp_land_left = maxf(0.0, _gp_land_left - delta)
 
-func _tick_attack_timer(delta: float) -> void:
-	if _attack_left <= 0.0:
-		return
-	_attack_left = maxf(0.0, _attack_left - delta)
-	if _attack_left <= 0.0 and state == State.CARTWHEEL:
-		_end_cartwheel()
+	if _attack_left > 0.0:
+		_attack_left = maxf(0.0, _attack_left - delta)
+		if _attack_left <= 0.0 and state == State.CARTWHEEL:
+			_end_cartwheel()
+			
+	if _wall_jump_lock_left > 0.0:
+		_wall_jump_lock_left = maxf(0.0, _wall_jump_lock_left - delta)
 
 func _update_facing(axis: int) -> void:
-	# Durante o Wall Jump Lock, não viramos o sprite pelo input, 
-	# ele deve manter a direção do impulso
-	if _wall_jump_lock_left > 0.0:
-		return
-		
+	if _wall_jump_lock_left > 0.0: return
 	if axis < 0:
 		_facing = -1
 	elif axis > 0:
 		_facing = 1
-
-	if anim_sprite != null:
-		anim_sprite.flip_h = _facing < 0
-
+	if anim_sprite != null: anim_sprite.flip_h = _facing < 0
 	_update_attack_hitbox_position(_facing)
 
 func _update_attack_hitbox_position(dir: int) -> void:
-	if attack_hitbox == null:
-		return
+	if attack_hitbox == null: return
 	attack_hitbox.position.x = attack_hitbox_offset_x * float(dir)
 	attack_hitbox.position.y = attack_hitbox_offset_y
 
@@ -291,17 +224,14 @@ func _current_speed_cap(input: PlayerInput.Snapshot) -> float:
 	return cap
 
 func set_state(next: State) -> void:
-	if next == state:
-		return
-	if not _can_transition(state, next):
-		return
+	if next == state: return
+	if not _can_transition(state, next): return
 	_exit_state(state)
 	state = next
 	_enter_state(state)
 
 func _can_transition(from: State, to: State) -> bool:
-	if from == State.MORTO:
-		return false
+	if from == State.MORTO: return false
 	if from == State.MACHUCADO and to in [State.DESLIZANDO, State.GROUND_POUND, State.CARTWHEEL, State.WALL_SLIDE]:
 		return false
 	return true
@@ -313,26 +243,24 @@ func _enter_state(s: State) -> void:
 		State.GLIDANDO:
 			_apply_glide_open_pop()
 		State.GROUND_POUND:
-			if velocity.y < ground_pound_start_speed:
-				velocity.y = ground_pound_start_speed
+			_gp_hold_timer = 0.0
+			if velocity.y < stats.ground_pound_start_speed:
+				velocity.y = stats.ground_pound_start_speed
 		State.GROUND_POUND_LAND:
-			_gp_land_left = ground_pound_land_seconds
+			_gp_land_left = stats.ground_pound_land_seconds
 		State.CARTWHEEL:
-			_attack_left = attack_seconds
+			_attack_left = stats.attack_seconds
 			_attack_dir = _facing
 			_cartwheel_air_jump_charges = 0
-
-			var base := absf(velocity.x)
-			var start := maxf(base, attack_start_speed)
+			
+			# Impulso inicial padrão
+			var start := maxf(absf(velocity.x), stats.attack_start_speed)
 			velocity.x = start * float(_attack_dir)
 
 			_update_attack_hitbox_position(_attack_dir)
 			_set_attack_hitbox_enabled(true)
 		State.WALL_SLIDE:
-			# Reseta velocidade vertical ao agarrar (opcional, mas dá um "mordida" melhor)
-			if velocity.y > 0:
-				velocity.y = 0 
-			# Força o facing para olhar para a parede
+			if velocity.y > 0: velocity.y = 0 
 			var w_normal = get_wall_normal().x
 			if w_normal != 0:
 				_facing = -int(sign(w_normal))
@@ -345,25 +273,25 @@ func _exit_state(s: State) -> void:
 		State.CARTWHEEL:
 			_set_attack_hitbox_enabled(false)
 
-func _update_state(input: PlayerInput.Snapshot, down_pressed: bool, attack_pressed: bool) -> void:
-	if state == State.GROUND_POUND_LAND:
-		return
+func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pressed: bool, delta: float) -> void:
+	if state == State.GROUND_POUND_LAND: return
 
-	if state not in [State.MACHUCADO, State.CARTWHEEL] and (not is_on_floor()) and down_pressed and state != State.WALL_SLIDE:
-		set_state(State.GROUND_POUND)
-		return
+	# --- Timer de Segurança para Ground Pound ---
+	if (not is_on_floor()) and input.down_held and input.axis == 0 and state != State.WALL_SLIDE:
+		_gp_hold_timer += delta
+		if _gp_hold_timer >= gp_hold_threshold:
+			set_state(State.GROUND_POUND)
+			return
+	else:
+		_gp_hold_timer = 0.0
+	# ---------------------------------------
 
 	if state not in [State.MACHUCADO, State.GROUND_POUND, State.GROUND_POUND_LAND] and is_on_floor() and attack_pressed:
-		if input.axis != 0:
-			_facing = input.axis
-			set_state(State.CARTWHEEL)
-			return
-		elif attack_allow_start_still:
-			set_state(State.CARTWHEEL)
-			return
-
-	if state == State.CARTWHEEL:
+		if input.axis != 0: _facing = input.axis
+		set_state(State.CARTWHEEL)
 		return
+	
+	if state == State.CARTWHEEL: return
 
 	if state != State.MACHUCADO and _should_slide(input):
 		set_state(State.DESLIZANDO)
@@ -376,35 +304,24 @@ func _update_state(input: PlayerInput.Snapshot, down_pressed: bool, attack_press
 			set_state(State.CAINDO)
 		return
 
-	if state == State.GROUND_POUND and not is_on_floor():
-		return
+	if state == State.GROUND_POUND and not is_on_floor(): return
 
 	if not is_on_floor():
-		# --- Lógica de Entrada/Saída do Wall Slide ---
-		# Requisitos: Caindo (y > 0), na parede, e input na direção da parede
-		if is_on_wall() and velocity.y > 0 and state != State.WALL_SLIDE and state != State.MACHUCADO:
+		# Wall Slide check com Threshold de Velocidade (Anti-Flicker)
+		if is_on_wall() and velocity.y > 20.0 and state != State.WALL_SLIDE:
 			var w_normal = get_wall_normal().x
-			# (Normal < 0 significa parede a direita, input > 0 significa direita)
-			# Se input for oposto à normal (segurando contra a parede)
 			var holding_against = (w_normal < 0 and input.axis > 0) or (w_normal > 0 and input.axis < 0)
-			
 			if holding_against:
 				set_state(State.WALL_SLIDE)
 				return
 		
-		# Sair do Wall Slide se soltar
 		if state == State.WALL_SLIDE:
-			if not is_on_wall():
-				set_state(State.CAINDO)
-				return
-			
 			var w_normal = get_wall_normal().x
 			var holding_against = (w_normal < 0 and input.axis > 0) or (w_normal > 0 and input.axis < 0)
-			if not holding_against:
+			if not is_on_wall() or not holding_against:
 				set_state(State.CAINDO)
 				return
-			return # Mantém no Wall Slide
-		# ---------------------------------------------
+			return 
 
 		if input.glide_held and velocity.y >= 0.0:
 			set_state(State.GLIDANDO)
@@ -426,13 +343,15 @@ func _update_state(input: PlayerInput.Snapshot, down_pressed: bool, attack_press
 		set_state(State.IDLE)
 
 func _should_slide(input: PlayerInput.Snapshot) -> bool:
-	if not is_on_floor():
-		return false
-	if not input.down_held:
-		return false
+	if not is_on_floor(): return false
+	if not input.down_held: return false
 	return absf(get_floor_angle()) > stats.slope_threshold
 
 func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
+	if _wall_jump_lock_left > 0.0:
+		_apply_friction(dt_ticks, 0.02)
+		return
+
 	var cap := _current_speed_cap(input)
 	var accel := stats.acceleration
 	var friction := stats.friction
@@ -441,13 +360,6 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 		accel *= stats.air_accel_multiplier
 		friction *= stats.air_friction_multiplier
 
-	# --- WALL JUMP LOCK: Se estiver travado pelo pulo na parede, ignora input ---
-	if _wall_jump_lock_left > 0.0:
-		# Pequeno atrito no ar para não voar para sempre, mas mantém inércia
-		_apply_friction(dt_ticks, 0.02)
-		return
-	# --------------------------------------------------------------------------
-
 	if input.axis != 0:
 		velocity.x += accel * float(input.axis) * dt_ticks
 		velocity.x = clampf(velocity.x, -cap, cap)
@@ -455,20 +367,18 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 		_apply_friction(dt_ticks, friction)
 
 func _apply_crouch(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
-	var friction := stats.friction
 	if input.axis != 0:
 		velocity.x += stats.acceleration * float(input.axis) * dt_ticks
-		velocity.x = clampf(velocity.x, -crouch_speed_cap, crouch_speed_cap)
+		velocity.x = clampf(velocity.x, -stats.crouch_speed_cap, stats.crouch_speed_cap)
 	else:
-		_apply_friction(dt_ticks, friction)
+		_apply_friction(dt_ticks, stats.friction)
 
 func _apply_look_up(dt_ticks: float) -> void:
 	_apply_friction(dt_ticks, stats.friction)
 
 func _apply_inertia(dt_ticks: float) -> void:
 	var friction := stats.friction
-	if not is_on_floor():
-		friction *= stats.air_friction_multiplier
+	if not is_on_floor(): friction *= stats.air_friction_multiplier
 	_apply_friction(dt_ticks, friction)
 
 func _apply_friction(dt_ticks: float, friction_factor: float) -> void:
@@ -485,38 +395,46 @@ func _apply_slide(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	if not _should_slide(input):
 		_slide_speed = stats.slide_speed_start
 		return
-
 	_slide_speed = minf(_slide_speed + stats.slide_acceleration * dt_ticks, stats.max_slide_speed)
-
-	_slope_direction = int(signf(get_floor_normal().x))
-	if _slope_direction == 0:
-		_slope_direction = 1
-
-	velocity.x = _slide_speed * float(_slope_direction) * stats.gravity
-	if anim_sprite != null:
-		anim_sprite.flip_h = _slope_direction < 0
-
-func _apply_wall_slide(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
-	# Se tocar no chão, State Machine no próximo frame resolve p/ IDLE/ANDANDO
-	# Aqui aplicamos a física de deslize
 	
-	# Gravidade reduzida
+	# Usando a variável de classe para silenciar o aviso e manter estado se necessário
+	_slope_direction = int(signf(get_floor_normal().x))
+	if _slope_direction == 0: _slope_direction = 1
+	
+	velocity.x = _slide_speed * float(_slope_direction) * stats.gravity
+	if anim_sprite != null: anim_sprite.flip_h = _slope_direction < 0
+
+func _apply_wall_slide(dt_ticks: float, _input: PlayerInput.Snapshot) -> void:
 	var grav_reduced := stats.gravity / stats.wall_slide_gravity_divisor
 	velocity.y += grav_reduced * dt_ticks
 	velocity.y = minf(velocity.y, stats.max_wall_slide_speed)
 
 func _apply_ground_pound(dt_ticks: float) -> void:
 	velocity.x = lerpf(velocity.x, 0.0, 0.25)
-	velocity.y += (stats.gravity * ground_pound_gravity_multiplier) * dt_ticks
-	velocity.y = minf(velocity.y, ground_pound_max_speed)
+	velocity.y += (stats.gravity * stats.ground_pound_gravity_multiplier) * dt_ticks
+	velocity.y = minf(velocity.y, stats.ground_pound_max_speed)
 
-func _apply_land_lock(dt_ticks: float) -> void:
+func _apply_land_lock(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	_apply_friction(dt_ticks, stats.friction)
+	if _gp_land_left <= 0.0:
+		if input.axis != 0 or input.jump_buffered or input.attack_pressed:
+			set_state(State.IDLE)
 
+# --- A MÁGICA DO DKC: OVERSPEED & COASTING ---
 func _apply_cartwheel(dt_ticks: float) -> void:
-	var target := clampf(absf(velocity.x), attack_start_speed, attack_max_speed) * float(_attack_dir)
-	velocity.x = lerpf(velocity.x, target, _lerp_factor_per_ticks(0.18, dt_ticks))
-	_apply_friction(dt_ticks, attack_friction)
+	var base_max := stats.attack_base_max_speed
+	var current_speed_abs := absf(velocity.x)
+	
+	# Fix do erro de tipo: Explicitando bool e int
+	var moving_same_dir: bool = (int(sign(velocity.x)) == _attack_dir)
+	
+	if current_speed_abs > base_max and moving_same_dir:
+		var t_fric = _lerp_factor_per_ticks(stats.attack_overspeed_friction, dt_ticks)
+		velocity.x = lerpf(velocity.x, base_max * float(_attack_dir), t_fric)
+	else:
+		var target := base_max * float(_attack_dir)
+		var t_accel = _lerp_factor_per_ticks(0.18, dt_ticks)
+		velocity.x = lerpf(velocity.x, target, t_accel)
 
 func _end_cartwheel() -> void:
 	_set_attack_hitbox_enabled(false)
@@ -526,43 +444,26 @@ func _end_cartwheel() -> void:
 		set_state(State.CAINDO)
 
 func _set_attack_hitbox_enabled(enabled: bool) -> void:
-	if attack_hitbox == null:
-		return
+	if attack_hitbox == null: return
 	attack_hitbox.monitoring = enabled
 
 func _apply_jump_logic_cartwheel_aware() -> void:
-	if state in [State.MACHUCADO, State.MORTO, State.GROUND_POUND, State.GROUND_POUND_LAND]:
-		return
-	if not player_input.peek_jump():
-		return
+	if state in [State.MACHUCADO, State.MORTO, State.GROUND_POUND, State.GROUND_POUND_LAND]: return
+	if not player_input.peek_jump(): return
 
-	# --- WALL JUMP LOGIC ---
-	# Permite pular se estiver no estado Wall Slide OU se estiver no ar encostado numa parede
 	var can_wall_jump = (state == State.WALL_SLIDE) or (is_on_wall() and not is_on_floor())
-	
 	if can_wall_jump:
 		player_input.consume_jump()
-		
 		var w_normal_x = get_wall_normal().x
-		# Fallback se normal for 0 (canto)
-		if w_normal_x == 0: 
-			w_normal_x = -_facing 
-		
-		# Aplica forças do Stats
+		if w_normal_x == 0: w_normal_x = -_facing
 		velocity.y = stats.wall_jump_y
-		velocity.x = stats.wall_jump_x * w_normal_x # Impulsiona para longe da parede
-		
-		# Trava input e vira o personagem
+		velocity.x = stats.wall_jump_x * w_normal_x
 		_wall_jump_lock_left = stats.wall_jump_lock_seconds
 		_facing = int(sign(velocity.x))
 		if anim_sprite: anim_sprite.flip_h = _facing < 0
-		
-		# Restaura charges de ataque aéreo
-		_cartwheel_air_jump_charges = 1 
-		
+		_cartwheel_air_jump_charges = 1
 		set_state(State.PULANDO)
 		return
-	# -----------------------
 
 	if is_on_floor():
 		player_input.consume_jump()
@@ -585,12 +486,9 @@ func _jump_now() -> void:
 	set_state(State.PULANDO)
 
 func _apply_gravity(dt_ticks: float) -> void:
-	if is_on_floor():
-		return
-	if state == State.WALL_SLIDE:
-		# Gravidade já aplicada no _apply_wall_slide
-		return
-		
+	if is_on_floor(): return
+	if state == State.WALL_SLIDE: return 
+
 	if state == State.GLIDANDO:
 		velocity.y += (stats.gravity / stats.glide_gravity_divisor) * dt_ticks
 		velocity.y = minf(velocity.y, stats.max_glide_fall_speed)
@@ -599,10 +497,8 @@ func _apply_gravity(dt_ticks: float) -> void:
 		velocity.y = minf(velocity.y, stats.max_fall_speed)
 
 func _apply_glide_open_pop() -> void:
-	if is_on_floor():
-		return
-	if velocity.y <= 0.0:
-		return
+	if is_on_floor(): return
+	if velocity.y <= 0.0: return
 	var upward_cap := -stats.glide_open_upward_cap
 	velocity.y = maxf(velocity.y - stats.glide_open_brake, upward_cap)
 
@@ -618,10 +514,9 @@ func _post_move() -> void:
 	var now_on_floor := is_on_floor()
 
 	if _was_on_floor and not now_on_floor and velocity.y >= 0.0:
-		# Só inicia coyote se não saiu pulando
-		if state != State.PULANDO: 
+		if state != State.PULANDO:
 			coyote_jump_timer.start()
-			
+
 	if now_on_floor and not _was_on_floor:
 		coyote_jump_timer.stop()
 
@@ -640,10 +535,8 @@ func _on_attack_area_entered(area: Area2D) -> void:
 	_handle_attack_hit(area)
 
 func _handle_attack_hit(target: Node) -> void:
-	if state != State.CARTWHEEL:
-		return
-	if target == null or target == self:
-		return
+	if state != State.CARTWHEEL: return
+	if target == null or target == self: return
 
 	var dir := _attack_dir
 	var did_something := false
@@ -655,40 +548,36 @@ func _handle_attack_hit(target: Node) -> void:
 		target.call("die")
 		did_something = true
 
-	if not did_something:
-		return
+	if not did_something: return
 
-	_attack_left = maxf(_attack_left, attack_extend_seconds_on_hit)
-	velocity.x = clampf(
-		velocity.x + (attack_speed_boost_on_hit * float(dir)),
-		-attack_max_speed,
-		attack_max_speed
-	)
-	_cartwheel_air_jump_charges = 1
+	# --- O HIT BOOST DO DKC ---
+	_attack_left = maxf(_attack_left, stats.attack_extend_seconds_on_hit)
+	
+	# Adiciona velocidade BRUTA (sem clamp imediato aqui)
+	velocity.x += stats.attack_speed_boost_add * float(dir)
+	
+	_cartwheel_air_jump_charges = 1 
 
 func take_damage(amount: int, from_dir: int) -> void:
-	if state == State.MORTO:
-		return
-	if _invuln_left > 0.0:
-		return
+	if state == State.MORTO: return
+	if _invuln_left > 0.0: return
 
 	hp -= amount
 	if hp <= 0:
 		_die()
 		return
 
-	_invuln_left = invuln_seconds
-	_hurt_left = hurt_lock_seconds
+	_invuln_left = stats.invuln_seconds
+	_hurt_left = stats.hurt_lock_seconds
 	set_state(State.MACHUCADO)
 
 	var dir := clampi(from_dir, -1, 1)
-	if dir == 0:
-		dir = -_facing
-	velocity.x = knockback_x * float(dir)
-	velocity.y = knockback_y
+	if dir == 0: dir = -_facing
+	velocity.x = stats.knockback_x * float(dir)
+	velocity.y = stats.knockback_y
 
 func heal(amount: int) -> void:
-	hp = clampi(hp + amount, 0, max_hp)
+	hp = clampi(hp + amount, 0, stats.max_hp)
 
 func _die() -> void:
 	is_alive = false
@@ -697,8 +586,7 @@ func _die() -> void:
 	_set_attack_hitbox_enabled(false)
 
 func _play_animations() -> void:
-	if anim_sprite == null:
-		return
+	if anim_sprite == null: return
 
 	if state == State.MORTO:
 		_play_anim("death")
@@ -712,12 +600,9 @@ func _play_animations() -> void:
 	if state == State.GROUND_POUND or state == State.GROUND_POUND_LAND:
 		_play_anim("ground_pound")
 		return
-
-	# --- Animação de Wall Slide ---
 	if state == State.WALL_SLIDE:
 		_play_anim("wall_slide")
 		return
-	# ------------------------------
 
 	if is_on_floor():
 		if state == State.DESLIZANDO and absf(get_floor_angle()) > stats.slope_threshold:
@@ -739,27 +624,19 @@ func _play_animations() -> void:
 		_play_anim("glide")
 		return
 
-	# --- Lógica de Animação de Pulo / Wall Jump ---
 	if velocity.y < 0.0:
-		# Se acabou de sair de um Wall Jump (está no lock), toca animação específica
 		if _wall_jump_lock_left > 0.0:
 			_play_anim("wall_jump")
 		else:
 			_play_anim("jump_up")
 	else:
 		_play_anim("jump_down")
-	# ----------------------------------------------
 
 func _play_anim(anim_name: String) -> void:
 	var anim_id := StringName(anim_name)
-
-	if anim_sprite.animation == anim_id and anim_sprite.is_playing():
-		return
-	if anim_sprite.sprite_frames == null:
-		return
-	if not anim_sprite.sprite_frames.has_animation(anim_id):
-		return
-
+	if anim_sprite.animation == anim_id and anim_sprite.is_playing(): return
+	if anim_sprite.sprite_frames == null: return
+	if not anim_sprite.sprite_frames.has_animation(anim_id): return
 	anim_sprite.play(anim_id)
 
 func _on_coyote_timer_timeout() -> void:
