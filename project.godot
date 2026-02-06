@@ -18,7 +18,7 @@ config/name="The Last Battery"
 config/description="Jogo feito por Ftcv"
 run/main_scene="uid://d4ab52ou0g3w5"
 config/features=PackedStringArray("4.6")
-config/icon="res://playericon.png"
+config/icon="res://to_import/iconthelastbt.png"
 
 [autoload]
 
@@ -29,6 +29,7 @@ SceneManager="*uid://grxi1qlp52j8"
 
 window/size/viewport_width=640
 window/size/viewport_height=360
+window/size/mode=2
 window/size/window_width_override=640
 window/size/window_height_override=360
 window/stretch/mode="viewport"
