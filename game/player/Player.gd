@@ -35,11 +35,10 @@ enum State {
 @export var attack_hitbox_offset_y: float = 0.0
 
 @export_group("Tuning Fino (Local)")
-# Tempo segurando BAIXO antes de iniciar o Ground Pound (evita acidentes)
 @export var gp_hold_threshold: float = 0.12 
 
 # -----------------------------------------------------------------------------
-# DEPENDÊNCIAS (NODES)
+# DEPENDÊNCIAS
 # -----------------------------------------------------------------------------
 @onready var coyote_jump_timer: Timer = get_node_or_null("CoyoteTimer")
 @onready var anim_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D")
@@ -52,7 +51,6 @@ enum State {
 var state: State = State.IDLE
 var is_alive: bool = true
 
-# Timers Lógicos
 var _invuln_left: float = 0.0
 var _hurt_left: float = 0.0
 var _wall_jump_lock_left: float = 0.0
@@ -60,7 +58,6 @@ var _gp_land_left: float = 0.0
 var _gp_hold_timer: float = 0.0 
 var _attack_left: float = 0.0
 
-# Controle de Movimento
 var _is_running: bool = false
 var _slide_speed: float = 0.0
 var _slope_direction: int = 0
@@ -68,23 +65,13 @@ var _facing: int = 1
 var _was_on_floor: bool = false
 var _down_was_held: bool = false
 
-# Controle de Ataque
 var _attack_dir: int = 1
 var _cartwheel_air_jump_charges: int = 0
 
 var _ok: bool = true
 
 # -----------------------------------------------------------------------------
-# API PÚBLICA
-# -----------------------------------------------------------------------------
-func is_crouching() -> bool:
-	return state == State.AGACHADO
-
-func is_looking_up() -> bool:
-	return state == State.OLHANDO_CIMA
-
-# -----------------------------------------------------------------------------
-# CICLO DE VIDA (INIT)
+# CICLO DE VIDA
 # -----------------------------------------------------------------------------
 func _ready() -> void:
 	_ok = _validate_and_init()
@@ -93,9 +80,7 @@ func _ready() -> void:
 		set_process(false)
 
 func _validate_and_init() -> bool:
-	if stats == null:
-		stats = PlayerStats.new()
-
+	if stats == null: stats = PlayerStats.new()
 	if coyote_jump_timer == null or anim_sprite == null or player_input == null:
 		return false
 
@@ -118,11 +103,9 @@ func _validate_and_init() -> bool:
 func _setup_attack_hitbox() -> void:
 	if attack_hitbox == null: return
 	attack_hitbox.monitoring = false
-	
 	var cb_body := Callable(self, "_on_attack_body_entered")
 	if not attack_hitbox.body_entered.is_connected(cb_body):
 		attack_hitbox.body_entered.connect(cb_body)
-
 	var cb_area := Callable(self, "_on_attack_area_entered")
 	if not attack_hitbox.area_entered.is_connected(cb_area):
 		attack_hitbox.area_entered.connect(cb_area)
@@ -174,18 +157,16 @@ func _physics_process(delta: float) -> void:
 	_play_animations()
 	
 	if debug_print:
-		print("St:", State.keys()[state], " Battery:", Global.session.battery, " VX:", int(velocity.x))
+		print("St:", State.keys()[state], " Ice:", _is_floor_ice(), " VX:", int(velocity.x))
 
 # -----------------------------------------------------------------------------
 # TIMERS
 # -----------------------------------------------------------------------------
 func _tick_timers(delta: float) -> void:
-	if _invuln_left > 0.0:
-		_invuln_left = maxf(0.0, _invuln_left - delta)
-	if _hurt_left > 0.0:
-		_hurt_left = maxf(0.0, _hurt_left - delta)
-		if _hurt_left <= 0.0 and state == State.MACHUCADO:
-			set_state(State.IDLE if is_on_floor() else State.CAINDO)
+	if _invuln_left > 0.0: _invuln_left = maxf(0.0, _invuln_left - delta)
+	if _hurt_left > 0.0: _hurt_left = maxf(0.0, _hurt_left - delta)
+	if _hurt_left <= 0.0 and state == State.MACHUCADO:
+		set_state(State.IDLE if is_on_floor() else State.CAINDO)
 
 	if state == State.GROUND_POUND_LAND and _gp_land_left > 0.0:
 		_gp_land_left = maxf(0.0, _gp_land_left - delta)
@@ -221,7 +202,7 @@ func _current_speed_cap(input: PlayerInput.Snapshot) -> float:
 	return cap
 
 # -----------------------------------------------------------------------------
-# MÁQUINA DE ESTADOS: TRANSIÇÕES
+# TRANSIÇÕES DE ESTADO
 # -----------------------------------------------------------------------------
 func set_state(next: State) -> void:
 	if next == state: return
@@ -266,14 +247,12 @@ func _exit_state(s: State) -> void:
 		State.CARTWHEEL: _set_attack_hitbox_enabled(false)
 
 func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pressed: bool, delta: float) -> void:
-	# --- AJUSTE 1: Ground Pound Land em Rampa vira Slide ---
 	if state == State.GROUND_POUND_LAND:
+		# Se estiver em rampa, desliza
 		if absf(get_floor_angle()) > stats.slope_threshold:
 			set_state(State.DESLIZANDO)
 		return
-	# -------------------------------------------------------
 
-	# Timer Ground Pound
 	if (not is_on_floor()) and input.down_held and input.axis == 0 and state != State.WALL_SLIDE:
 		_gp_hold_timer += delta
 		if _gp_hold_timer >= gp_hold_threshold:
@@ -321,14 +300,9 @@ func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pres
 		else: set_state(State.PULANDO if velocity.y < 0.0 else State.CAINDO)
 		return
 
-	if input.down_held:
-		set_state(State.AGACHADO)
-		return
-	if input.up_held and input.axis == 0 and absf(velocity.x) <= 0.1:
-		set_state(State.OLHANDO_CIMA)
-		return
-	if absf(velocity.x) > 0.1: set_state(State.ANDANDO)
-	else: set_state(State.IDLE)
+	if input.down_held: set_state(State.AGACHADO); return
+	if input.up_held and input.axis == 0 and absf(velocity.x) <= 0.1: set_state(State.OLHANDO_CIMA); return
+	set_state(State.ANDANDO if absf(velocity.x) > 0.1 else State.IDLE)
 
 func _should_slide(input: PlayerInput.Snapshot) -> bool:
 	if not is_on_floor() or not input.down_held: return false
@@ -341,19 +315,20 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	if _wall_jump_lock_left > 0.0:
 		_apply_friction(dt_ticks, 0.02)
 		return
+	
 	var cap := _current_speed_cap(input)
 	var current_friction = _get_friction_to_apply()
-	if input.axis != 0:
-		velocity.x += stats.acceleration * float(input.axis) * dt_ticks
-		velocity.x = clampf(velocity.x, -cap, cap)
-	else: _apply_friction(dt_ticks, current_friction)
+	# AJUSTE: Tração reduzida no gelo para "curva de drift"
+	var current_acceleration = _get_acceleration_to_apply()
 
-# --- AJUSTE 2: Agachado sem movimento, mas com inércia (gelo) ---
+	if input.axis != 0:
+		velocity.x += current_acceleration * float(input.axis) * dt_ticks
+		velocity.x = clampf(velocity.x, -cap, cap)
+	else:
+		_apply_friction(dt_ticks, current_friction)
+
 func _apply_crouch(dt_ticks: float, _input: PlayerInput.Snapshot) -> void:
-	# Não aplicamos aceleração (não pode andar)
-	# Aplicamos fricção dinâmica:
-	# Se for gelo -> fricção baixa -> desliza longe
-	# Se for chão -> fricção alta -> para rápido
+	# Agachado usa fricção do chão (se for gelo, desliza muito; se não, para rápido)
 	var f = _get_friction_to_apply()
 	_apply_friction(dt_ticks, f)
 
@@ -385,11 +360,8 @@ func _apply_wall_slide(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	var grav_reduced := stats.gravity / stats.wall_slide_gravity_divisor
 	velocity.y += grav_reduced * dt_ticks
 	velocity.y = minf(velocity.y, stats.max_wall_slide_speed)
-	
-	# FORCE PUSH contra a parede
 	var w_normal = get_wall_normal().x
-	if w_normal == 0:
-		w_normal = -input.axis if input.axis != 0 else -_facing
+	if w_normal == 0: w_normal = -input.axis if input.axis != 0 else -_facing
 	velocity.x = -w_normal * 10.0
 
 func _apply_ground_pound(dt_ticks: float) -> void:
@@ -544,11 +516,17 @@ func _play_anim(anim_name: String) -> void:
 	if anim_sprite.sprite_frames and anim_sprite.sprite_frames.has_animation(anim_id):
 		anim_sprite.play(anim_id)
 
-# --- HELPERS ---
+# --- HELPERS ESPECIAIS (GELO E PAREDE) ---
 func _get_friction_to_apply() -> float:
 	if is_on_floor() and _is_floor_ice():
 		return stats.friction * 0.15 
 	return stats.friction
+
+# AJUSTE: Tração reduzida no gelo
+func _get_acceleration_to_apply() -> float:
+	if is_on_floor() and _is_floor_ice():
+		return stats.acceleration * 0.15
+	return stats.acceleration
 
 func _is_floor_ice() -> bool:
 	for i in get_slide_collision_count():
@@ -567,19 +545,12 @@ func _is_touching_world_wall() -> bool:
 	
 	for i in get_slide_collision_count():
 		var col := get_slide_collision(i)
-		# Normal horizontal = parede
 		if absf(col.get_normal().x) > 0.5:
 			var collider = col.get_collider()
-			
-			# 1. Se for TileMapLayer, aceita direto (assumindo que terreno é world)
 			if collider is TileMapLayer:
 				return true
-				
-			# 2. Se for TileMap legado
 			if collider is TileMap:
 				return true
-			
-			# 3. Se for objeto com layer
 			if collider and "collision_layer" in collider:
 				if (collider.collision_layer & PhysicsLayers.bit(PhysicsLayers.WORLD)) != 0:
 					return true
