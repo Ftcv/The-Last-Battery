@@ -35,6 +35,7 @@ enum State {
 @export var attack_hitbox_offset_y: float = 0.0
 
 @export_group("Tuning Fino (Local)")
+# Tempo segurando BAIXO antes de iniciar o Ground Pound (evita acidentes)
 @export var gp_hold_threshold: float = 0.12 
 
 # -----------------------------------------------------------------------------
@@ -173,7 +174,7 @@ func _physics_process(delta: float) -> void:
 	_play_animations()
 	
 	if debug_print:
-		print("St:", State.keys()[state], " Bat:", Global.session.battery, " VX:", int(velocity.x))
+		print("St:", State.keys()[state], " Battery:", Global.session.battery, " VX:", int(velocity.x))
 
 # -----------------------------------------------------------------------------
 # TIMERS
@@ -265,8 +266,14 @@ func _exit_state(s: State) -> void:
 		State.CARTWHEEL: _set_attack_hitbox_enabled(false)
 
 func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pressed: bool, delta: float) -> void:
-	if state == State.GROUND_POUND_LAND: return
+	# --- AJUSTE 1: Ground Pound Land em Rampa vira Slide ---
+	if state == State.GROUND_POUND_LAND:
+		if absf(get_floor_angle()) > stats.slope_threshold:
+			set_state(State.DESLIZANDO)
+		return
+	# -------------------------------------------------------
 
+	# Timer Ground Pound
 	if (not is_on_floor()) and input.down_held and input.axis == 0 and state != State.WALL_SLIDE:
 		_gp_hold_timer += delta
 		if _gp_hold_timer >= gp_hold_threshold:
@@ -295,7 +302,6 @@ func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pres
 	if state == State.GROUND_POUND and not is_on_floor(): return
 
 	if not is_on_floor():
-		# Wall Slide filtra Layer do Mundo e velocidade mínima
 		if _is_touching_world_wall() and velocity.y > 20.0 and state != State.WALL_SLIDE:
 			var w_normal = get_wall_normal().x
 			var holding_against = (w_normal < 0 and input.axis > 0) or (w_normal > 0 and input.axis < 0)
@@ -342,11 +348,14 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 		velocity.x = clampf(velocity.x, -cap, cap)
 	else: _apply_friction(dt_ticks, current_friction)
 
-func _apply_crouch(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
-	if input.axis != 0:
-		velocity.x += stats.acceleration * float(input.axis) * dt_ticks
-		velocity.x = clampf(velocity.x, -stats.crouch_speed_cap, stats.crouch_speed_cap)
-	else: _apply_friction(dt_ticks, stats.friction)
+# --- AJUSTE 2: Agachado sem movimento, mas com inércia (gelo) ---
+func _apply_crouch(dt_ticks: float, _input: PlayerInput.Snapshot) -> void:
+	# Não aplicamos aceleração (não pode andar)
+	# Aplicamos fricção dinâmica:
+	# Se for gelo -> fricção baixa -> desliza longe
+	# Se for chão -> fricção alta -> para rápido
+	var f = _get_friction_to_apply()
+	_apply_friction(dt_ticks, f)
 
 func _apply_look_up(dt_ticks: float) -> void: _apply_friction(dt_ticks, stats.friction)
 func _apply_inertia(dt_ticks: float) -> void:
@@ -377,7 +386,7 @@ func _apply_wall_slide(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	velocity.y += grav_reduced * dt_ticks
 	velocity.y = minf(velocity.y, stats.max_wall_slide_speed)
 	
-	# FORCE PUSH contra a parede para manter is_on_wall() TRUE
+	# FORCE PUSH contra a parede
 	var w_normal = get_wall_normal().x
 	if w_normal == 0:
 		w_normal = -input.axis if input.axis != 0 else -_facing
@@ -546,34 +555,32 @@ func _is_floor_ice() -> bool:
 		var col := get_slide_collision(i)
 		if col.get_normal().y < -0.5:
 			var collider = col.get_collider()
-			if collider and "get_cell_tile_data" in collider:
+			if collider is TileMapLayer:
 				var coords = collider.local_to_map(collider.to_local(col.get_position() - col.get_normal()))
 				var data = collider.get_cell_tile_data(coords)
 				if data and data.get_custom_data("is_ice"):
 					return true
 	return false
 
-
 func _is_touching_world_wall() -> bool:
 	if not is_on_wall(): return false
 	
 	for i in get_slide_collision_count():
 		var col := get_slide_collision(i)
-		# Verifica se o ângulo é horizontal (Parede)
+		# Normal horizontal = parede
 		if absf(col.get_normal().x) > 0.5:
 			var collider = col.get_collider()
 			
-			# 1. Se for TileMapLayer (O chão que você desenhou), É VÁLIDO!
+			# 1. Se for TileMapLayer, aceita direto (assumindo que terreno é world)
 			if collider is TileMapLayer:
 				return true
 				
-			# 2. Se for TileMap antigo (caso mude de ideia), É VÁLIDO!
+			# 2. Se for TileMap legado
 			if collider is TileMap:
 				return true
 			
-			# 3. Para outros objetos (Caixas, Portas), checamos a layer manualmente
+			# 3. Se for objeto com layer
 			if collider and "collision_layer" in collider:
 				if (collider.collision_layer & PhysicsLayers.bit(PhysicsLayers.WORLD)) != 0:
 					return true
-					
 	return false
