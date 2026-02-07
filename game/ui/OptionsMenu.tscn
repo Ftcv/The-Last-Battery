@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://div4jc3ks5amw"]
+
+[ext_resource type="Script" uid="uid://xphrqyltbjn5" path="res://game/ui/options_menu.gd" id="1_7r4tj"]
+[ext_resource type="Shader" uid="uid://g2rm8rcjnuk7" path="res://game/ui/OptionMenu.gdshader" id="2_xj7nc"]
+[ext_resource type="Texture2D" uid="uid://bgrbe8bt0twl7" path="res://assets/imagens/TitleScreen.jpg" id="3_jsrnl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pr28i"]
+shader = ExtResource("2_xj7nc")
+shader_parameter/blur_strenght = 1.750000083125
+
+[node name="OptionsMenu" type="Control" unique_id=246804951]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_7r4tj")
+
+[node name="OptionsBackgroundBlur" type="TextureRect" parent="." unique_id=1745610237]
+material = SubResource("ShaderMaterial_pr28i")
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_jsrnl")
+
+[node name="OptionsCenter" type="CenterContainer" parent="." unique_id=1609697341]
+layout_mode = 0
+offset_left = 185.0
+offset_top = 176.0
+offset_right = 455.0
+offset_bottom = 358.0
+
+[node name="OptionsPanel" type="PanelContainer" parent="OptionsCenter" unique_id=1406879981]
+layout_mode = 2
+
+[node name="OptionsVBox" type="VBoxContainer" parent="OptionsCenter/OptionsPanel" unique_id=1762994711]
+layout_mode = 2
+
+[node name="TitleOptionsLabel" type="Label" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=4110498]
+layout_mode = 2
+
+[node name="MusicRow" type="HBoxContainer" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=303786793]
+layout_mode = 2
+
+[node name="LabelMusic" type="Label" parent="OptionsCenter/OptionsPanel/OptionsVBox/MusicRow" unique_id=230326561]
+layout_mode = 2
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="OptionsCenter/OptionsPanel/OptionsVBox/MusicRow" unique_id=2061195854]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+step = 10.0
+
+[node name="SfxRow" type="HBoxContainer" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=1497722884]
+layout_mode = 2
+
+[node name="LabelSFX" type="Label" parent="OptionsCenter/OptionsPanel/OptionsVBox/SfxRow" unique_id=1973505285]
+layout_mode = 2
+text = "SFX"
+
+[node name="SfxSlider" type="HSlider" parent="OptionsCenter/OptionsPanel/OptionsVBox/SfxRow" unique_id=901985567]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 50.0
+step = 5.0
+
+[node name="FullscreenCheck" type="CheckButton" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=1811246903]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="VsyncCheck" type="CheckButton" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=235076175]
+layout_mode = 2
+text = "Vsync"
+
+[node name="BackButton" type="Button" parent="OptionsCenter/OptionsPanel/OptionsVBox" unique_id=372486431]
+layout_mode = 2
+text = "Back
+"

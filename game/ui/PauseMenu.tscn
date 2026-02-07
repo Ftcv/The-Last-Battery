@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cetkcribh4vpx"]
 
 [ext_resource type="Script" uid="uid://dyr6ub02s3hdn" path="res://PauseMenu.gd" id="1_vxuhx"]
+[ext_resource type="PackedScene" uid="uid://div4jc3ks5amw" path="res://game/ui/OptionsMenu.tscn" id="2_g02oy"]
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=332642119]
 process_mode = 3
@@ -41,3 +42,5 @@ text = "Map"
 [node name="BtnQuit" type="Button" parent="Background/MenuOptions" unique_id=707966270]
 layout_mode = 2
 text = "Quit"
+
+[node name="OptionsMenu" parent="." unique_id=246804951 instance=ExtResource("2_g02oy")]

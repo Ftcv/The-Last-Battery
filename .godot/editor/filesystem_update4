@@ -1,15 +1,1 @@
-res://default_env.tres
-res://game/levels/Playground.tscn
 res://game/ui/OptionMenu.gdshader
-res://game/player/stats/player_stats_default.tres
-res://game/systems/Global.gd
-res://game/levels/Goal.gd
-res://game/systems/session/SessionData.gd
-res://PauseMenu.gd
-res://game/player/Player.tscn
-res://LevelBase.gd
-res://game/levels/LevelBase.tscn
-res://game/levels/level_1.tscn
-res://game/systems/scene_manager/SceneManager.gd
-res://game/world/checkpoints/Checkpoint.gd
-res://game/ui/PauseMenu.tscn
