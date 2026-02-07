@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://i71ge47yyicm"]
+
+[ext_resource type="Script" uid="uid://jq67470c263b" path="res://LevelBase.gd" id="1_42lap"]
+[ext_resource type="PackedScene" uid="uid://b8jcm5753ovyd" path="res://game/player/Player.tscn" id="2_ixipk"]
+[ext_resource type="PackedScene" uid="uid://cetkcribh4vpx" path="res://game/ui/PauseMenu.tscn" id="3_0box3"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_72w7x"]
+
+[node name="LevelBase" type="Node2D" unique_id=1621707594]
+script = ExtResource("1_42lap")
+
+[node name="Parallax2D" type="ParallaxBackground" parent="." unique_id=796710368]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="Parallax2D" unique_id=236833444]
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax2D/ParallaxLayer" unique_id=759806824]
+
+[node name="GamePlay" type="Node2D" parent="." unique_id=364204640]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="GamePlay" unique_id=1944138291]
+
+[node name="Decoration" type="TileMapLayer" parent="GamePlay" unique_id=1403684519]
+
+[node name="Hazards" type="Node2D" parent="GamePlay" unique_id=1804400997]
+
+[node name="Checkpoints" type="Node2D" parent="GamePlay" unique_id=647090147]
+
+[node name="Enemies" type="Node2D" parent="GamePlay" unique_id=373048503]
+
+[node name="PlayerStart" type="Marker2D" parent="GamePlay" unique_id=2129267527]
+
+[node name="Player" parent="GamePlay" unique_id=1339262225 instance=ExtResource("2_ixipk")]
+
+[node name="DeathZone" type="Area2D" parent="." unique_id=1556778185]
+collision_mask = 6
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone" unique_id=1654732625]
+shape = SubResource("WorldBoundaryShape2D_72w7x")
+
+[node name="GameUI" type="CanvasLayer" parent="." unique_id=1452421757]
+
+[node name="PauseMenu" parent="GameUI" unique_id=332642119 instance=ExtResource("3_0box3")]

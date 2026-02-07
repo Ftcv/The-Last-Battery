@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cgpb30bh0o0j5"]
+
+[ext_resource type="Script" uid="uid://dr6ppi8uvend1" path="res://dev/DevReload.gd" id="1_3yglm"]
+
+[node name="DevReload" type="Node" unique_id=554609661]
+script = ExtResource("1_3yglm")

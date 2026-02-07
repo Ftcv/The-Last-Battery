@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cfg1ntsrd6fx4"]
+
+[ext_resource type="Script" uid="uid://ccv14b71sroyv" path="res://game/levels/PlayerCamera2D.gd" id="1_5bx45"]
+
+[node name="Camera2D" type="Camera2D" unique_id=1448990731]
+zoom = Vector2(2, 2)
+process_callback = 0
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.22
+drag_top_margin = 0.26
+drag_right_margin = 0.22
+drag_bottom_margin = 0.32
+editor_draw_drag_margin = true
+script = ExtResource("1_5bx45")
+look_ahead_x_max = 90.0
+look_ahead_x_lerp_speed = 1.0

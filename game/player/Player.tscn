@@ -4,6 +4,7 @@
 [ext_resource type="Resource" uid="uid://dxye4646gc0qf" path="res://game/player/stats/player_stats_default.tres" id="2_38lxl"]
 [ext_resource type="Texture2D" uid="uid://j2sduexk2le0" path="res://assets/imagens/Playersprite.png" id="3"]
 [ext_resource type="Script" uid="uid://cappyoa32bd1h" path="res://game/player/player_input.gd" id="4_o4naa"]
+[ext_resource type="PackedScene" uid="uid://cfg1ntsrd6fx4" path="res://game/player/Camera2D.tscn" id="5_38lxl"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o4naa"]
 atlas = ExtResource("3")
@@ -345,3 +346,5 @@ monitoring = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox" unique_id=918304520]
 position = Vector2(0, -15.25)
 shape = SubResource("RectangleShape2D_o4naa")
+
+[node name="Camera2D" parent="." unique_id=1448990731 instance=ExtResource("5_38lxl")]

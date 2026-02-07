@@ -9,6 +9,7 @@ max_run_speed = 220.0
 acceleration = 40.0
 stop_threshold = 2.0
 gravity = 9.0
+glide_gravity_divisor = 5.0
 glide_open_brake = 30.0
 wall_jump_lock_seconds = 0.3
 metadata/_custom_type_script = "uid://b5y4v3at8f2kd"

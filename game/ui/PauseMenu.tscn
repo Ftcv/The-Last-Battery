@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://cetkcribh4vpx"]
+
+[ext_resource type="Script" uid="uid://dyr6ub02s3hdn" path="res://PauseMenu.gd" id="1_vxuhx"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=332642119]
+process_mode = 3
+script = ExtResource("1_vxuhx")
+
+[node name="Background" type="ColorRect" parent="." unique_id=184183508]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="MenuOptions" type="VBoxContainer" parent="Background" unique_id=671109707]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+alignment = 1
+
+[node name="BtnResume" type="Button" parent="Background/MenuOptions" unique_id=1362264774]
+layout_mode = 2
+text = "Resume"
+
+[node name="BtnOptions" type="Button" parent="Background/MenuOptions" unique_id=1549909134]
+layout_mode = 2
+text = "Options"
+
+[node name="BtnMap" type="Button" parent="Background/MenuOptions" unique_id=1162783890]
+layout_mode = 2
+text = "Map"
+
+[node name="BtnQuit" type="Button" parent="Background/MenuOptions" unique_id=707966270]
+layout_mode = 2
+text = "Quit"
