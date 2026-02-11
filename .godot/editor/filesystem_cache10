@@ -1,11 +1,11 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1770846948
+::res://::1770847946
 default_bus_layout.tres::AudioBusLayout::321246895729976081::1768653982::0::1::::<><><>0<>0<><>::
-default_env.tres::Environment::3563669176288526195::1770505300::0::1::::<><><>0<>0<><>::
-icon.png::CompressedTexture2D/CompressedTexture2D::1748100145045867406::1766788188::1766788188::1::::<><><>0<>0<>a5b1a24ca51a0dfab6a0ce1c6cf355c6<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
+default_env.tres::Environment::3563669176288526195::1770847834::0::1::::<><><>0<>0<><>::
+icon.png::CompressedTexture2D::1748100145045867406::1766788188::1770847947::1::::<><><>0<>0<>90e754ea8e480e13e9a0494d5a4ba138<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
 LevelBase.gd::GDScript::666670582738516685::1770500404::0::1::::LevelBase<>Node2D<><>0<>0<><>::
 PauseMenu.gd::GDScript::8880806755260334639::1770504340::0::1::::<>CanvasLayer<><>0<>0<><>::
-playericon.png::CompressedTexture2D/CompressedTexture2D::3265391844454269755::1766788188::1766788188::1::::<><><>0<>0<>59b8db4fb56504d6ed6a4bcb63a8e423<>res://.godot/imported/playericon.png-4fcd3f09d136717904a5507b8fd74fbe.ctex::
+playericon.png::CompressedTexture2D::3265391844454269755::1766788188::1770847947::1::::<><><>0<>0<>e8f0e902619861a787ee95c761bb32a4<>res://.godot/imported/playericon.png-4fcd3f09d136717904a5507b8fd74fbe.ctex::
 ::res://addons/::1767059259
 ::res://assets/::1767059300
 ::res://assets/animacoes/::1766788188
@@ -13,32 +13,32 @@ Respirando.tres::Animation::-1::1766788188::0::1::::<><><>0<>0<><>::
 ::res://assets/audio/::1768518349
 ::res://assets/audio/musics/::1768518349
 ::res://assets/audio/sfx/::1768518383
-ui_accept.wav::AudioStreamWAV::1327487366706845138::1768518383::1768518357::1::::<><><>0<>0<>18fecb2afdf4989e51b04e7c0b3718bf<>res://.godot/imported/ui_accept.wav-cc1d412e6d84623b4fc9863737cbff74.sample::
-ui_select.wav::AudioStreamWAV::6372018036070633418::1768518357::1768518357::1::::<><><>0<>0<>6268ece91474fb349531ef0e7d477a44<>res://.godot/imported/ui_select.wav-d70ac7a88c51f2b31630dac3382b4179.sample::
+ui_accept.wav::AudioStreamWAV::1327487366706845138::1768518383::1770847947::1::::<><><>0<>0<>18fecb2afdf4989e51b04e7c0b3718bf<>res://.godot/imported/ui_accept.wav-cc1d412e6d84623b4fc9863737cbff74.sample::
+ui_select.wav::AudioStreamWAV::6372018036070633418::1768518357::1770847947::1::::<><><>0<>0<>6268ece91474fb349531ef0e7d477a44<>res://.godot/imported/ui_select.wav-d70ac7a88c51f2b31630dac3382b4179.sample::
 ::res://assets/imagens/::1770410501
-Playersprite.png::CompressedTexture2D::688537113059089189::1769991934::1769991939::1::::<><><>0<>0<>48846072652381b5708b2cb989b75960<>res://.godot/imported/Playersprite.png-6ec43507fef915d63767f7168b645940.ctex::
-SOFRIDO.png::CompressedTexture2D::8905808492964789603::1766788188::1767059293::1::::<><><>0<>0<>d99afc0f8fb9411dff8b8e7c83d6f6c7<>res://.godot/imported/SOFRIDO.png-0f7f1f286c15394fae6ee58f80c8bdfd.ctex::
-Tileset_atlas_template.png::CompressedTexture2D::8746643789252515223::1766788188::1767059293::1::::<><><>0<>0<>4f5b47834dba8107480b6f94ea659377<>res://.godot/imported/Tileset_atlas_template.png-679b35e1030617f074bf5daadfae3a26.ctex::
-Tileset_autotile_template.png::CompressedTexture2D::8591515925042301048::1766788188::1767059293::1::::<><><>0<>0<>1c7f9e471402ae2014c15b6a618c668a<>res://.godot/imported/Tileset_autotile_template.png-a1d4b8b22413630d44aa36bbd77e1b09.ctex::
-tileset_demo.png::CompressedTexture2D::5006385854896830463::1770410501::1770410501::1::::<><><>0<>0<>689afe606b98929b755eb95dfa95a4c6<>res://.godot/imported/tileset_demo.png-8da445836266fc487b6a05656a78f2ed.ctex::
-TitleScreen.jpg::CompressedTexture2D::2842717763221510838::1768514197::1768514201::1::::<><><>0<>0<>92bc9278f7af27ab558d358ceaebe88d<>res://.godot/imported/TitleScreen.jpg-d61aad517e90970cfeb0342617d2f084.ctex::
-::res://dev/::1770499362
-demo_lvl1.tscn::PackedScene::6893091074959299217::1769444372::0::1::::<><><>0<>0<><>::uid://nu1ku3auc2k3::::res://game/systems/scene_manager/SceneManager.tscn<>uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://dwu67e1ntfu7p::::res://assets/imagens/Tileset_atlas_template.png<>uid://dhu6q58yeb3cc::::res://dev/Seashore War.mp3<>uid://f0hhpw784seu::::res://game/enemies/SimpleEnemy.tscn
+Playersprite.png::CompressedTexture2D::688537113059089189::1769991934::1770847947::1::::<><><>0<>0<>48846072652381b5708b2cb989b75960<>res://.godot/imported/Playersprite.png-6ec43507fef915d63767f7168b645940.ctex::
+SOFRIDO.png::CompressedTexture2D::8905808492964789603::1766788188::1770847947::1::::<><><>0<>0<>d99afc0f8fb9411dff8b8e7c83d6f6c7<>res://.godot/imported/SOFRIDO.png-0f7f1f286c15394fae6ee58f80c8bdfd.ctex::
+Tileset_atlas_template.png::CompressedTexture2D::8746643789252515223::1766788188::1770847947::1::::<><><>0<>0<>4f5b47834dba8107480b6f94ea659377<>res://.godot/imported/Tileset_atlas_template.png-679b35e1030617f074bf5daadfae3a26.ctex::
+Tileset_autotile_template.png::CompressedTexture2D::8591515925042301048::1766788188::1770847947::1::::<><><>0<>0<>1c7f9e471402ae2014c15b6a618c668a<>res://.godot/imported/Tileset_autotile_template.png-a1d4b8b22413630d44aa36bbd77e1b09.ctex::
+tileset_demo.png::CompressedTexture2D::5006385854896830463::1770410501::1770847947::1::::<><><>0<>0<>689afe606b98929b755eb95dfa95a4c6<>res://.godot/imported/tileset_demo.png-8da445836266fc487b6a05656a78f2ed.ctex::
+TitleScreen.jpg::CompressedTexture2D::2842717763221510838::1768514197::1770847947::1::::<><><>0<>0<>92bc9278f7af27ab558d358ceaebe88d<>res://.godot/imported/TitleScreen.jpg-d61aad517e90970cfeb0342617d2f084.ctex::
+::res://dev/::1770847681
+demo_lvl1.tscn::PackedScene::6893091074959299217::1770847681::0::1::::<><><>0<>0<><>::uid://nu1ku3auc2k3::::res://game/systems/scene_manager/SceneManager.tscn<>uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://dwu67e1ntfu7p::::res://assets/imagens/Tileset_atlas_template.png<>uid://dhu6q58yeb3cc::::res://dev/Seashore War.mp3<>uid://f0hhpw784seu::::res://game/enemies/SimpleEnemy.tscn
 DevReload.gd::GDScript::8417406117204067940::1769903785::0::1::::DevReload<>Node<><>0<>0<><>::
 dev_reload.tscn::PackedScene::5225052129727990484::1770499362::0::1::::<><><>0<>0<><>::uid://dr6ppi8uvend1::::res://dev/DevReload.gd
-Seashore War.mp3::AudioStreamMP3::7693783938879881406::1766788188::1767059815::1::::<><><>0<>0<>816f0f2ddebf33de6d0bfcd679d64846<>res://.godot/imported/Seashore War.mp3-2618d9fa20dee4d876c154a9ace825f4.mp3str::
+Seashore War.mp3::AudioStreamMP3::7693783938879881406::1766788188::1770847947::1::::<><><>0<>0<>816f0f2ddebf33de6d0bfcd679d64846<>res://.godot/imported/Seashore War.mp3-2618d9fa20dee4d876c154a9ace825f4.mp3str::
 ::res://game/::1769477112
 ::res://game/enemies/::1769478679
 EnemyBase.gd::GDScript::9064243391460689221::1769478679::0::1::::EnemyBase<>CharacterBody2D<><>0<>0<><>::
 EnemyBase.tscn::PackedScene::2407010435229293514::1769445460::0::1::::<><><>0<>0<><>::uid://d2e108ug4setp::::res://game/enemies/EnemyBase.gd<>uid://y517o2s45rw5::::res://icon.png
 SimpleEnemy.gd::GDScript::7084853063560472604::1769388871::0::1::::SimpleEnemy<>EnemyBase<><>0<>0<><>::
 SimpleEnemy.tscn::PackedScene::402992004883498588::1769389640::0::1::::<><><>0<>0<><>::uid://baj8d0njxt4sk::::res://game/enemies/EnemyBase.tscn<>uid://c767q3bpwvj3y::::res://game/enemies/SimpleEnemy.gd
-::res://game/levels/::1770505293
+::res://game/levels/::1770847834
 Goal.gd::GDScript::4696179541150422173::1770496371::0::1::::<>RefCounted<><>0<>0<><>::
 LevelBase.tscn::PackedScene::629160450189216240::1770505045::0::1::::<><><>0<>0<><>::uid://jq67470c263b::::res://LevelBase.gd<>uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://cetkcribh4vpx::::res://game/ui/PauseMenu.tscn
 PlayerCamera2D.gd::GDScript::4958201520495843941::1770416114::0::1::::<>Camera2D<><>0<>0<><>::
 Playground.gd::GDScript::7334695682786707583::1769905072::0::1::::<>Node2D<><>0<>0<><>::
-Playground.tscn::PackedScene::8978061699254129386::1770499459::0::1::::<><><>0<>0<><>::uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://dcq8mponhr4sp::::res://game/levels/Playground.gd<>uid://c4jcprwlr75mj::::res://game/world/hazards/HazardArea.tscn<>uid://bli5bea72wehj::::res://game/levels/tile_map_layer_demo.tscn<>uid://cx3iqyjypktfn::::res://game/world/checkpoints/Checkpoint.tscn<>uid://cgpb30bh0o0j5::::res://dev/dev_reload.tscn<>uid://f0hhpw784seu::::res://game/enemies/SimpleEnemy.tscn
+Playground.tscn::PackedScene::4964506056388330144::1770847834::0::1::::<><><>0<>0<><>::uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://dcq8mponhr4sp::::res://game/levels/Playground.gd<>uid://c4jcprwlr75mj::::res://game/world/hazards/HazardArea.tscn<>uid://bli5bea72wehj::::res://game/levels/tile_map_layer_demo.tscn<>uid://cx3iqyjypktfn::::res://game/world/checkpoints/Checkpoint.tscn<>uid://cgpb30bh0o0j5::::res://dev/dev_reload.tscn<>uid://f0hhpw784seu::::res://game/enemies/SimpleEnemy.tscn
 tile_map_layer_demo.tscn::PackedScene::3176836492905119079::1770413245::0::1::::<><><>0<>0<><>::uid://cdlepc11v6oq6::::res://assets/imagens/tileset_demo.png
 ::res://game/player/::1770505045
 Camera2D.tscn::PackedScene::5137774735761182855::1770497895::0::1::::<><><>0<>0<><>::uid://ccv14b71sroyv::::res://game/levels/PlayerCamera2D.gd
@@ -57,13 +57,13 @@ SceneManager.gd::GDScript::457639651677098111::1770498580::0::1::::<>Node<><>0<>
 SceneManager.tscn::PackedScene::955340115874956972::1769896377::0::1::::<><><>0<>0<><>::uid://grxi1qlp52j8::::res://game/systems/scene_manager/SceneManager.gd
 ::res://game/systems/session/::1770496371
 SessionData.gd::GDScript::1918986392182180857::1770496371::0::1::::SessionData<>Resource<><>0<>0<><>::
-::res://game/ui/::1770505327
+::res://game/ui/::1770847681
 MainMenu.gd::GDScript::6926833629841033443::1769900650::0::1::::<>Control<><>0<>0<><>::
 MainMenu.tscn::PackedScene::9194854248092257210::1770503887::0::1::::<><><>0<>0<><>::uid://c5xn65fwv8c5h::::res://game/ui/MainMenu.gd<>uid://bgrbe8bt0twl7::::res://assets/imagens/TitleScreen.jpg<>uid://dhu6q58yeb3cc::::res://dev/Seashore War.mp3<>uid://cw1whaigjwy0y::::res://assets/audio/sfx/ui_select.wav<>uid://s6br1ti1qm3k::::res://assets/audio/sfx/ui_accept.wav<>uid://div4jc3ks5amw::::res://game/ui/OptionsMenu.tscn
-OptionMenu.gdshader::Shader::477926639227359036::1770505327::0::1::::<><><>0<>0<><>::
+OptionMenu.gdshader::Shader::477926639227359036::1770847681::0::1::::<><><>0<>0<><>::
 OptionsMenu.tscn::PackedScene::7765901746735000830::1770505278::0::1::::<><><>0<>0<><>::uid://xphrqyltbjn5::::res://game/ui/options_menu.gd<>uid://g2rm8rcjnuk7::::res://game/ui/OptionMenu.gdshader<>uid://bgrbe8bt0twl7::::res://assets/imagens/TitleScreen.jpg
 options_menu.gd::GDScript::1645765325405528468::1768676901::0::1::::<>Control<><>0<>0<><>::
-PauseMenu.tscn::PackedScene::5093431566092284001::1770505299::0::1::::<><><>0<>0<><>::uid://dyr6ub02s3hdn::::res://PauseMenu.gd<>uid://div4jc3ks5amw::::res://game/ui/OptionsMenu.tscn
+PauseMenu.tscn::PackedScene::5093431566092284001::1770847681::0::1::::<><><>0<>0<><>::uid://dyr6ub02s3hdn::::res://PauseMenu.gd<>uid://div4jc3ks5amw::::res://game/ui/OptionsMenu.tscn
 ::res://game/world/::1769477429
 ::res://game/world/checkpoints/::1770498672
 Checkpoint.gd::GDScript::9040154146705958696::1770498672::0::1::::<>Area2D<><>0<>0<><>::
