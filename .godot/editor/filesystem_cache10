@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1770505321
+::res://::1770846948
 default_bus_layout.tres::AudioBusLayout::321246895729976081::1768653982::0::1::::<><><>0<>0<><>::
 default_env.tres::Environment::3563669176288526195::1770505300::0::1::::<><><>0<>0<><>::
 icon.png::CompressedTexture2D/CompressedTexture2D::1748100145045867406::1766788188::1766788188::1::::<><><>0<>0<>a5b1a24ca51a0dfab6a0ce1c6cf355c6<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
@@ -57,10 +57,10 @@ SceneManager.gd::GDScript::457639651677098111::1770498580::0::1::::<>Node<><>0<>
 SceneManager.tscn::PackedScene::955340115874956972::1769896377::0::1::::<><><>0<>0<><>::uid://grxi1qlp52j8::::res://game/systems/scene_manager/SceneManager.gd
 ::res://game/systems/session/::1770496371
 SessionData.gd::GDScript::1918986392182180857::1770496371::0::1::::SessionData<>Resource<><>0<>0<><>::
-::res://game/ui/::1770505299
+::res://game/ui/::1770505327
 MainMenu.gd::GDScript::6926833629841033443::1769900650::0::1::::<>Control<><>0<>0<><>::
 MainMenu.tscn::PackedScene::9194854248092257210::1770503887::0::1::::<><><>0<>0<><>::uid://c5xn65fwv8c5h::::res://game/ui/MainMenu.gd<>uid://bgrbe8bt0twl7::::res://assets/imagens/TitleScreen.jpg<>uid://dhu6q58yeb3cc::::res://dev/Seashore War.mp3<>uid://cw1whaigjwy0y::::res://assets/audio/sfx/ui_select.wav<>uid://s6br1ti1qm3k::::res://assets/audio/sfx/ui_accept.wav<>uid://div4jc3ks5amw::::res://game/ui/OptionsMenu.tscn
-OptionMenu.gdshader::Shader::477926639227359036::1770505278::0::1::::<><><>0<>0<><>::
+OptionMenu.gdshader::Shader::477926639227359036::1770505327::0::1::::<><><>0<>0<><>::
 OptionsMenu.tscn::PackedScene::7765901746735000830::1770505278::0::1::::<><><>0<>0<><>::uid://xphrqyltbjn5::::res://game/ui/options_menu.gd<>uid://g2rm8rcjnuk7::::res://game/ui/OptionMenu.gdshader<>uid://bgrbe8bt0twl7::::res://assets/imagens/TitleScreen.jpg
 options_menu.gd::GDScript::1645765325405528468::1768676901::0::1::::<>Control<><>0<>0<><>::
 PauseMenu.tscn::PackedScene::5093431566092284001::1770505299::0::1::::<><><>0<>0<><>::uid://dyr6ub02s3hdn::::res://PauseMenu.gd<>uid://div4jc3ks5amw::::res://game/ui/OptionsMenu.tscn
