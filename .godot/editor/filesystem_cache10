@@ -1,7 +1,7 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1770847946
+::res://::1770863991
 default_bus_layout.tres::AudioBusLayout::321246895729976081::1768653982::0::1::::<><><>0<>0<><>::
-default_env.tres::Environment::3563669176288526195::1770847834::0::1::::<><><>0<>0<><>::
+default_env.tres::Environment::3563669176288526195::1770847950::0::1::::<><><>0<>0<><>::
 icon.png::CompressedTexture2D::1748100145045867406::1766788188::1770847947::1::::<><><>0<>0<>90e754ea8e480e13e9a0494d5a4ba138<>res://.godot/imported/icon.png-487276ed1e3a0c39cad0279d744ee560.ctex::
 LevelBase.gd::GDScript::666670582738516685::1770500404::0::1::::LevelBase<>Node2D<><>0<>0<><>::
 PauseMenu.gd::GDScript::8880806755260334639::1770504340::0::1::::<>CanvasLayer<><>0<>0<><>::
@@ -12,17 +12,17 @@ playericon.png::CompressedTexture2D::3265391844454269755::1766788188::1770847947
 Respirando.tres::Animation::-1::1766788188::0::1::::<><><>0<>0<><>::
 ::res://assets/audio/::1768518349
 ::res://assets/audio/musics/::1768518349
-::res://assets/audio/sfx/::1768518383
+::res://assets/audio/sfx/::1770847947
 ui_accept.wav::AudioStreamWAV::1327487366706845138::1768518383::1770847947::1::::<><><>0<>0<>18fecb2afdf4989e51b04e7c0b3718bf<>res://.godot/imported/ui_accept.wav-cc1d412e6d84623b4fc9863737cbff74.sample::
 ui_select.wav::AudioStreamWAV::6372018036070633418::1768518357::1770847947::1::::<><><>0<>0<>6268ece91474fb349531ef0e7d477a44<>res://.godot/imported/ui_select.wav-d70ac7a88c51f2b31630dac3382b4179.sample::
-::res://assets/imagens/::1770410501
+::res://assets/imagens/::1770847947
 Playersprite.png::CompressedTexture2D::688537113059089189::1769991934::1770847947::1::::<><><>0<>0<>48846072652381b5708b2cb989b75960<>res://.godot/imported/Playersprite.png-6ec43507fef915d63767f7168b645940.ctex::
 SOFRIDO.png::CompressedTexture2D::8905808492964789603::1766788188::1770847947::1::::<><><>0<>0<>d99afc0f8fb9411dff8b8e7c83d6f6c7<>res://.godot/imported/SOFRIDO.png-0f7f1f286c15394fae6ee58f80c8bdfd.ctex::
 Tileset_atlas_template.png::CompressedTexture2D::8746643789252515223::1766788188::1770847947::1::::<><><>0<>0<>4f5b47834dba8107480b6f94ea659377<>res://.godot/imported/Tileset_atlas_template.png-679b35e1030617f074bf5daadfae3a26.ctex::
 Tileset_autotile_template.png::CompressedTexture2D::8591515925042301048::1766788188::1770847947::1::::<><><>0<>0<>1c7f9e471402ae2014c15b6a618c668a<>res://.godot/imported/Tileset_autotile_template.png-a1d4b8b22413630d44aa36bbd77e1b09.ctex::
 tileset_demo.png::CompressedTexture2D::5006385854896830463::1770410501::1770847947::1::::<><><>0<>0<>689afe606b98929b755eb95dfa95a4c6<>res://.godot/imported/tileset_demo.png-8da445836266fc487b6a05656a78f2ed.ctex::
 TitleScreen.jpg::CompressedTexture2D::2842717763221510838::1768514197::1770847947::1::::<><><>0<>0<>92bc9278f7af27ab558d358ceaebe88d<>res://.godot/imported/TitleScreen.jpg-d61aad517e90970cfeb0342617d2f084.ctex::
-::res://dev/::1770847681
+::res://dev/::1770847947
 demo_lvl1.tscn::PackedScene::6893091074959299217::1770847681::0::1::::<><><>0<>0<><>::uid://nu1ku3auc2k3::::res://game/systems/scene_manager/SceneManager.tscn<>uid://b8jcm5753ovyd::::res://game/player/Player.tscn<>uid://dwu67e1ntfu7p::::res://assets/imagens/Tileset_atlas_template.png<>uid://dhu6q58yeb3cc::::res://dev/Seashore War.mp3<>uid://f0hhpw784seu::::res://game/enemies/SimpleEnemy.tscn
 DevReload.gd::GDScript::8417406117204067940::1769903785::0::1::::DevReload<>Node<><>0<>0<><>::
 dev_reload.tscn::PackedScene::5225052129727990484::1770499362::0::1::::<><><>0<>0<><>::uid://dr6ppi8uvend1::::res://dev/DevReload.gd

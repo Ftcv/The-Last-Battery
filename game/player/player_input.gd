@@ -9,7 +9,8 @@ class_name PlayerInput
 @export var action_down: StringName = &"down"
 @export var action_glide: StringName = &"ui_rs"
 @export var action_jump: StringName = &"jump"
-@export var action_attack: StringName = &"attack"
+@export var action_attack: StringName = &"attack" # Pode manter mapeado, mas o run vai dominar
+@export var action_change_stats: StringName = &"change_stats" # NOVO
 
 class Snapshot:
 	var axis: int = 0
@@ -21,6 +22,8 @@ class Snapshot:
 	var jump_released: bool = false
 	var jump_buffered: bool = false
 	var attack_pressed: bool = false
+	var attack_held: bool = false 
+	var change_stats_pressed: bool = false # NOVO
 
 var snapshot := Snapshot.new()
 
@@ -38,14 +41,34 @@ func poll() -> void:
 	var a := Input.get_axis(action_left, action_right)
 	snapshot.axis = int(signf(a))
 
-	snapshot.run_held = Input.is_action_pressed(action_run)
 	snapshot.up_held = Input.is_action_pressed(action_up)
 	snapshot.down_held = Input.is_action_pressed(action_down)
 	snapshot.down_pressed = Input.is_action_just_pressed(action_down)
-
 	snapshot.glide_held = Input.is_action_pressed(action_glide)
-	snapshot.attack_pressed = Input.is_action_just_pressed(action_attack)
+	
+	# --- LÓGICA DKC (Unificação de Botões) ---
+	# O botão de correr (action_run) serve como gatilho de ataque.
+	# Se o jogador tiver um botão "Attack" separado mapeado, ele também funciona (OU lógico).
+	
+	var run_btn_just_pressed = Input.is_action_just_pressed(action_run)
+	var run_btn_pressed = Input.is_action_pressed(action_run)
+	
+	var atk_btn_just_pressed = Input.is_action_just_pressed(action_attack)
+	var atk_btn_pressed = Input.is_action_pressed(action_attack)
+	
+	# 1. Ataque é disparado se apertar Run ou Attack
+	snapshot.attack_pressed = run_btn_just_pressed or atk_btn_just_pressed
+	
+	# 2. Segurar o ataque (para manter giro ou correr)
+	snapshot.attack_held = run_btn_pressed or atk_btn_pressed
+	
+	# 3. Correr é verdadeiro se o botão estiver segurado
+	snapshot.run_held = snapshot.attack_held
+
 	snapshot.jump_released = Input.is_action_just_released(action_jump)
+	
+	# NOVO: Detecta troca de stats
+	snapshot.change_stats_pressed = Input.is_action_just_pressed(action_change_stats)
 
 	var pressed := Input.is_action_just_pressed(action_jump)
 	if pressed:

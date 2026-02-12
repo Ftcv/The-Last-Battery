@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="PlayerStats" format=3 uid="uid://ckyfdygyi8urq"]
+
+[ext_resource type="Script" uid="uid://b5y4v3at8f2kd" path="res://game/player/player_stats.gd" id="1_anec0"]
+
+[resource]
+script = ExtResource("1_anec0")
+max_walk_speed = 135.0
+max_run_speed = 205.0
+acceleration = 30.0
+friction = 0.22
+stop_threshold = 2.0
+jump_speed = -420.0
+run_jump_multiplier = 1.15
+jump_cut_multiplier = 0.64
+gravity = 16.9
+max_fall_speed = 480.0
+max_glide_fall_speed = 150.0
+coyote_seconds = 0.1
+jump_buffer_seconds = 0.08
+max_slide_speed = 60.0
+max_wall_slide_speed = 180.0
+wall_jump_y = -380.0
+wall_jump_x = 200.0
+wall_jump_lock_seconds = 0.15
+attack_initial_boost = 40.0
+attack_min_speed = 210.0
+attack_base_max_speed = 270.0
+attack_hold_acceleration = 15.0
+attack_friction = 0.02
+attack_overspeed_friction = 0.0
+enemy_bounce_velocity = -380.0
+invuln_seconds = 1.33
+hurt_lock_seconds = 0.3
+knockback_x = 200.0
+knockback_y = -250.0
+metadata/_custom_type_script = "uid://b5y4v3at8f2kd"

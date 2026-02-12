@@ -67,6 +67,12 @@ var _down_was_held: bool = false
 
 var _attack_dir: int = 1
 var _cartwheel_air_jump_charges: int = 0
+var _consecutive_hits: int = 0 # Contador para lógica de Extra Life (8 hits)
+
+# Variáveis para o sistema de troca de stats (Dev Tool)
+var _stats_list: Array[PlayerStats] = []
+var _current_stats_index: int = 0
+const STATS_FOLDER_PATH = "res://game/player/stats/"
 
 var _ok: bool = true
 
@@ -74,10 +80,40 @@ var _ok: bool = true
 # CICLO DE VIDA
 # -----------------------------------------------------------------------------
 func _ready() -> void:
+	# Carrega lista de stats para troca dinâmica
+	_load_stats_list()
+	
 	_ok = _validate_and_init()
 	if not _ok:
 		set_physics_process(false)
 		set_process(false)
+
+func _load_stats_list() -> void:
+	var dir = DirAccess.open(STATS_FOLDER_PATH)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if !dir.current_is_dir() and file_name.ends_with(".tres"):
+				var res = load(STATS_FOLDER_PATH + file_name)
+				if res is PlayerStats:
+					_stats_list.append(res)
+			file_name = dir.get_next()
+		
+		# Ordena para garantir consistência na troca
+		# (Opcional, mas bom para não mudar a ordem aleatoriamente)
+		# _stats_list.sort_custom(func(a, b): return a.resource_path < b.resource_path)
+		
+		if _stats_list.is_empty() and stats != null:
+			_stats_list.append(stats)
+		elif not _stats_list.is_empty():
+			# Tenta encontrar o stats atual na lista
+			var idx = _stats_list.find(stats)
+			if idx != -1:
+				_current_stats_index = idx
+			else:
+				stats = _stats_list[0]
+				_current_stats_index = 0
 
 func _validate_and_init() -> bool:
 	if stats == null: stats = PlayerStats.new()
@@ -126,6 +162,11 @@ func _physics_process(delta: float) -> void:
 
 	player_input.poll()
 	var input := player_input.snapshot
+	
+	# --- LÓGICA DE TROCA DE STATS (DEV TOOL) ---
+	if input.change_stats_pressed and not _stats_list.is_empty():
+		_cycle_stats()
+	
 	var down_pressed := input.down_held and not _down_was_held
 	_down_was_held = input.down_held
 	var attack_pressed := input.attack_pressed
@@ -141,7 +182,7 @@ func _physics_process(delta: float) -> void:
 		State.OLHANDO_CIMA: _apply_look_up(dt_ticks)
 		State.GROUND_POUND: _apply_ground_pound(dt_ticks)
 		State.GROUND_POUND_LAND: _apply_land_lock(dt_ticks, input)
-		State.CARTWHEEL: _apply_cartwheel(dt_ticks)
+		State.CARTWHEEL: _apply_cartwheel(dt_ticks, input)
 		State.WALL_SLIDE: _apply_wall_slide(dt_ticks, input)
 		_: _apply_walk(dt_ticks, input)
 
@@ -159,6 +200,27 @@ func _physics_process(delta: float) -> void:
 	if debug_print:
 		print("St:", State.keys()[state], " Ice:", _is_floor_ice(), " VX:", int(velocity.x))
 
+# Função helper para trocar stats
+func _cycle_stats() -> void:
+	_current_stats_index = (_current_stats_index + 1) % _stats_list.size()
+	stats = _stats_list[_current_stats_index]
+	
+	# Reconfigura dependências que usam stats
+	player_input.configure_from_stats(stats)
+	floor_snap_length = stats.floor_snap_length
+	coyote_jump_timer.wait_time = stats.coyote_seconds
+	
+	# Feedback visual: Cor baseada no índice
+	# Usamos HSV para garantir cores vibrantes e distintas
+	if anim_sprite:
+		if _stats_list.size() > 1:
+			var hue = float(_current_stats_index) / float(_stats_list.size())
+			anim_sprite.modulate = Color.from_hsv(hue, 0.7, 1.0) # Saturação 0.7, Valor 1.0
+		else:
+			anim_sprite.modulate = Color.WHITE
+			
+	print("Stats alterado para: ", stats.resource_path.get_file())
+
 # -----------------------------------------------------------------------------
 # TIMERS
 # -----------------------------------------------------------------------------
@@ -172,7 +234,9 @@ func _tick_timers(delta: float) -> void:
 		_gp_land_left = maxf(0.0, _gp_land_left - delta)
 
 	if _attack_left > 0.0:
-		_attack_left = maxf(0.0, _attack_left - delta)
+		if is_on_floor():
+			_attack_left = maxf(0.0, _attack_left - delta)
+		
 		if _attack_left <= 0.0 and state == State.CARTWHEEL:
 			_end_cartwheel()
 			
@@ -181,15 +245,39 @@ func _tick_timers(delta: float) -> void:
 
 func _update_facing(axis: int) -> void:
 	if _wall_jump_lock_left > 0.0: return
+	
+	if state == State.CARTWHEEL and is_on_floor():
+		return 
+
 	if axis < 0: _facing = -1
 	elif axis > 0: _facing = 1
 	if anim_sprite != null: anim_sprite.flip_h = _facing < 0
 	_update_attack_hitbox_position(_facing)
 
 func _update_attack_hitbox_position(dir: int) -> void:
+	if state == State.CARTWHEEL: return 
+
 	if attack_hitbox == null: return
 	attack_hitbox.position.x = attack_hitbox_offset_x * float(dir)
 	attack_hitbox.position.y = attack_hitbox_offset_y
+
+func _update_attack_hitbox_shape(extended: bool) -> void:
+	if attack_hitbox == null: return
+	var shape_node = attack_hitbox.get_node_or_null("CollisionShape2D")
+	if shape_node == null: return
+	
+	var base_size = Vector2(12, 29.5) 
+	
+	if extended:
+		var extension = stats.attack_hitbox_extend_x
+		shape_node.position.x = (attack_hitbox_offset_x * float(_attack_dir)) + (extension * 0.5 * float(_attack_dir))
+		
+		if shape_node.shape is RectangleShape2D:
+			shape_node.shape.size.x = base_size.x + extension
+	else:
+		shape_node.position.x = attack_hitbox_offset_x * float(_facing)
+		if shape_node.shape is RectangleShape2D:
+			shape_node.shape.size = base_size
 
 func _update_run_latch(input: PlayerInput.Snapshot) -> void:
 	if is_on_floor(): _is_running = input.run_held
@@ -229,11 +317,14 @@ func _enter_state(s: State) -> void:
 			_attack_left = stats.attack_seconds
 			_attack_dir = _facing
 			_cartwheel_air_jump_charges = 0
-			var start_speed := stats.attack_start_speed
-			if absf(velocity.x) > start_speed:
-				start_speed = minf(absf(velocity.x), stats.attack_base_max_speed)
-			velocity.x = start_speed * float(_attack_dir)
+			
+			var current_spd = absf(velocity.x)
+			var start_target = maxf(current_spd + stats.attack_initial_boost, stats.attack_min_speed)
+			velocity.x = start_target * float(_attack_dir)
+			
+			_update_attack_hitbox_shape(true)
 			_set_attack_hitbox_enabled(true)
+			
 		State.WALL_SLIDE:
 			if velocity.y > 0: velocity.y = 0 
 			var w_normal = get_wall_normal().x
@@ -244,11 +335,12 @@ func _enter_state(s: State) -> void:
 func _exit_state(s: State) -> void:
 	match s:
 		State.DESLIZANDO: _slide_speed = stats.slide_speed_start
-		State.CARTWHEEL: _set_attack_hitbox_enabled(false)
+		State.CARTWHEEL: 
+			_set_attack_hitbox_enabled(false)
+			_update_attack_hitbox_shape(false) 
 
 func _update_state(input: PlayerInput.Snapshot, _down_pressed: bool, attack_pressed: bool, delta: float) -> void:
 	if state == State.GROUND_POUND_LAND:
-		# Se estiver em rampa, desliza
 		if absf(get_floor_angle()) > stats.slope_threshold:
 			set_state(State.DESLIZANDO)
 		return
@@ -318,7 +410,6 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 	
 	var cap := _current_speed_cap(input)
 	var current_friction = _get_friction_to_apply()
-	# AJUSTE: Tração reduzida no gelo para "curva de drift"
 	var current_acceleration = _get_acceleration_to_apply()
 
 	if input.axis != 0:
@@ -328,7 +419,6 @@ func _apply_walk(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 		_apply_friction(dt_ticks, current_friction)
 
 func _apply_crouch(dt_ticks: float, _input: PlayerInput.Snapshot) -> void:
-	# Agachado usa fricção do chão (se for gelo, desliza muito; se não, para rápido)
 	var f = _get_friction_to_apply()
 	_apply_friction(dt_ticks, f)
 
@@ -375,21 +465,43 @@ func _apply_land_lock(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
 		if input.axis != 0 or input.jump_buffered or input.attack_pressed or not input.down_held:
 			set_state(State.IDLE)
 
-func _apply_cartwheel(dt_ticks: float) -> void:
+func _apply_cartwheel(dt_ticks: float, input: PlayerInput.Snapshot) -> void:
+	if not is_on_floor():
+		var cap := _current_speed_cap(input)
+		if absf(velocity.x) > cap: cap = absf(velocity.x)
+		
+		var accel = stats.acceleration * stats.air_accel_multiplier
+		var fric = stats.friction * stats.air_friction_multiplier
+
+		if input.axis != 0:
+			velocity.x += accel * float(input.axis) * dt_ticks
+			velocity.x = clampf(velocity.x, -cap, cap)
+			_facing = input.axis
+			_attack_dir = input.axis 
+			if anim_sprite: anim_sprite.flip_h = _facing < 0
+		else:
+			_apply_friction(dt_ticks, fric)
+		return
+
 	var base_max := stats.attack_base_max_speed
-	var start_speed := stats.attack_start_speed
 	var moving_same_dir: bool = (int(sign(velocity.x)) == _attack_dir)
 	
 	if absf(velocity.x) > base_max and moving_same_dir:
 		var t_fric = _lerp_factor_per_ticks(stats.attack_overspeed_friction, dt_ticks)
 		velocity.x = lerpf(velocity.x, base_max * float(_attack_dir), t_fric)
 	else:
-		var target := start_speed * float(_attack_dir)
-		var t_accel = _lerp_factor_per_ticks(0.18, dt_ticks)
-		velocity.x = lerpf(velocity.x, target, t_accel)
+		if input.attack_held:
+			velocity.x += stats.attack_hold_acceleration * float(_attack_dir) * dt_ticks
+			if absf(velocity.x) > base_max:
+				velocity.x = base_max * float(_attack_dir)
+		else:
+			var target := stats.attack_min_speed * float(_attack_dir) 
+			var t_accel = _lerp_factor_per_ticks(0.18, dt_ticks)
+			velocity.x = lerpf(velocity.x, target, t_accel)
 
 func _end_cartwheel() -> void:
 	_set_attack_hitbox_enabled(false)
+	_update_attack_hitbox_shape(false)
 	set_state(State.ANDANDO if absf(velocity.x) > 0.1 else State.IDLE if is_on_floor() else State.CAINDO)
 
 func _set_attack_hitbox_enabled(enabled: bool) -> void:
@@ -447,7 +559,10 @@ func _post_move() -> void:
 	if _was_on_floor and not now_on_floor and velocity.y >= 0.0 and state != State.PULANDO:
 		coyote_jump_timer.start()
 	if now_on_floor and not _was_on_floor: coyote_jump_timer.stop()
-	if now_on_floor and not _was_on_floor and state == State.GROUND_POUND: set_state(State.GROUND_POUND_LAND)
+	if now_on_floor:
+		_consecutive_hits = 0 
+		if not _was_on_floor and state == State.GROUND_POUND: set_state(State.GROUND_POUND_LAND)
+
 	if (not now_on_floor) and _was_on_floor and state == State.CARTWHEEL: _cartwheel_air_jump_charges = max(_cartwheel_air_jump_charges, 1)
 	_was_on_floor = now_on_floor
 
@@ -465,9 +580,26 @@ func _handle_attack_hit(target: Node) -> void:
 		did_something = true
 
 	if did_something:
-		_attack_left = maxf(_attack_left, stats.attack_extend_seconds_on_hit)
-		velocity.x += stats.attack_speed_boost_add * float(_attack_dir)
+		_attack_left = stats.attack_hit_extend_seconds
+		
+		var boost = stats.attack_hit_boost
+		if sign(velocity.x) == sign(_attack_dir) or abs(velocity.x) < 10.0:
+			velocity.x += boost * _attack_dir
+		else:
+			velocity.x = boost * _attack_dir
+		
+		_consecutive_hits += 1
+		if _consecutive_hits >= 8:
+			print("EXTRA LIFE! (Combo 8)")
+			_consecutive_hits = 0 
+		
 		_cartwheel_air_jump_charges = 1 
+
+func bounce() -> void:
+	if velocity.y > 0: 
+		velocity.y = stats.enemy_bounce_velocity
+		_cartwheel_air_jump_charges = 1
+		set_state(State.PULANDO)
 
 func take_damage(amount: int, from_dir: int) -> void:
 	if state == State.MORTO or _invuln_left > 0.0: return
@@ -522,7 +654,6 @@ func _get_friction_to_apply() -> float:
 		return stats.friction * 0.15 
 	return stats.friction
 
-# AJUSTE: Tração reduzida no gelo
 func _get_acceleration_to_apply() -> float:
 	if is_on_floor() and _is_floor_ice():
 		return stats.acceleration * 0.15

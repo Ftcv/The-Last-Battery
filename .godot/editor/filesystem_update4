@@ -1,1 +1,9 @@
 res://default_env.tres
+res://game/ui/MainMenu.tscn
+res://game/player/player_input.gd
+res://game/player/player_stats.gd
+res://game/player/Player.gd
+res://game/levels/Playground.tscn
+res://game/player/stats/player_stats_default.tres
+res://game/player/stats/player_stats_dkc.tres
+res://game/levels/tile_map_layer_demo.tscn

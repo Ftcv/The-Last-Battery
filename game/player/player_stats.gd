@@ -57,14 +57,30 @@ class_name PlayerStats
 @export var wall_jump_lock_seconds: float = 0.10
 
 @export_group("Cartwheel / Attack")
-@export var attack_start_speed: float = 260.0
-@export var attack_base_max_speed: float = 450.0 # Velocidade normal do rolamento (sem boost)
-@export var attack_seconds: float = 0.40
-@export var attack_extend_seconds_on_hit: float = 0.35
-@export var attack_speed_boost_add: float = 120.0 # Adiciona isso a cada hit (Acumulativo)
-@export var attack_friction: float = 0.04 # Fricção normal
-@export var attack_overspeed_friction: float = 0.01 # Fricção MUITO baixa quando estiver boostado (Coasting)
+@export var attack_initial_boost: float = 30.0 
+@export var attack_min_speed: float = 180.0 
+@export var attack_base_max_speed: float = 320.0 
+@export var attack_seconds: float = 0.40 # Base timer
+
+# Configurações de input sustentado (aceleração manual)
+@export var attack_hold_acceleration: float = 10.0 
+@export var attack_friction: float = 0.04 
+@export var attack_overspeed_friction: float = 0.01 
 @export var attack_allow_start_still: bool = true
+
+@export_group("DKC SNES Physics")
+# 0x0040 no SNES ~ 0.25px/frame acumulativo.
+# No Godot, um valor de 60.0 somado diretamente à velocity.x dá o "pop" correto.
+@export var attack_hit_boost: float = 60.0 
+
+# O SNES reseta o timer para 24 frames (~0.4s) a cada hit.
+@export var attack_hit_extend_seconds: float = 0.4 
+
+# Hitbox extra (pixel perfect): Estende o colisor fisicamente para frente.
+@export var attack_hitbox_extend_x: float = 10.0 
+
+# Bounce fixo (0x0600) para o Jump-Kill
+@export var enemy_bounce_velocity: float = -350.0 
 
 @export_group("HP / Dano")
 @export var max_hp: int = 3
