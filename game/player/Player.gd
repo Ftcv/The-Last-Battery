@@ -546,7 +546,7 @@ func _post_move() -> void:
 	if is_on_wall() and state != State.WALL_SLIDE: velocity.x = 0.0
 	if is_on_ceiling(): velocity.y = maxf(velocity.y, 0.0)
 
-	# A LINHA velocity.y = 0.0 FOI REMOVIDA PARA O CHÃO REGISTRAR A COLISÃO DO SLIDE
+	# A LINHA velocity.y = 0.0 FOI REMOVIDA PARA O CHÃO REGISTRAR A COLISÃO DO SLIDE.
 
 	var now_on_floor := is_on_floor()
 	if _was_on_floor and not now_on_floor and velocity.y >= 0.0 and state != State.PULANDO:
