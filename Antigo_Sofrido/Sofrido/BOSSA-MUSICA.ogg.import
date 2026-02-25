@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/BOSSA-MUSICA.ogg-99e67f257d4dc640e0b4cea4d8b9bbd1.oggstr"
+
+[deps]
+
+source_file="res://BOSSA-MUSICA.ogg"
+dest_files=[ "res://.import/BOSSA-MUSICA.ogg-99e67f257d4dc640e0b4cea4d8b9bbd1.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

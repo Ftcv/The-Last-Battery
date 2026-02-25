@@ -45,6 +45,10 @@ enum State {
 @onready var player_input: PlayerInput = get_node_or_null("PlayerInput")
 @onready var attack_hitbox: Area2D = get_node_or_null("AttackHitbox")
 
+# Sensores para a borda (Ledge Balance)
+@onready var floor_probe_l: RayCast2D = get_node_or_null("FloorProbeL")
+@onready var floor_probe_r: RayCast2D = get_node_or_null("FloorProbeR")
+
 # -----------------------------------------------------------------------------
 # VARIÁVEIS DE ESTADO
 # -----------------------------------------------------------------------------
@@ -67,9 +71,8 @@ var _down_was_held: bool = false
 
 var _attack_dir: int = 1
 var _cartwheel_air_jump_charges: int = 0
-var _consecutive_hits: int = 0 # Contador para lógica de Extra Life (8 hits)
+var _consecutive_hits: int = 0
 
-# Variáveis para o sistema de troca de stats (Dev Tool)
 var _stats_list: Array[PlayerStats] = []
 var _current_stats_index: int = 0
 const STATS_FOLDER_PATH = "res://game/player/stats/"
@@ -80,7 +83,6 @@ var _ok: bool = true
 # CICLO DE VIDA
 # -----------------------------------------------------------------------------
 func _ready() -> void:
-	# Carrega lista de stats para troca dinâmica
 	_load_stats_list()
 	
 	_ok = _validate_and_init()
@@ -100,14 +102,9 @@ func _load_stats_list() -> void:
 					_stats_list.append(res)
 			file_name = dir.get_next()
 		
-		# Ordena para garantir consistência na troca
-		# (Opcional, mas bom para não mudar a ordem aleatoriamente)
-		# _stats_list.sort_custom(func(a, b): return a.resource_path < b.resource_path)
-		
 		if _stats_list.is_empty() and stats != null:
 			_stats_list.append(stats)
 		elif not _stats_list.is_empty():
-			# Tenta encontrar o stats atual na lista
 			var idx = _stats_list.find(stats)
 			if idx != -1:
 				_current_stats_index = idx
@@ -152,6 +149,7 @@ func _setup_attack_hitbox() -> void:
 func _physics_process(delta: float) -> void:
 	if not _ok: return
 	var dt_ticks := delta * float(Engine.physics_ticks_per_second)
+	
 	_tick_timers(delta)
 
 	if state == State.MORTO:
@@ -163,7 +161,6 @@ func _physics_process(delta: float) -> void:
 	player_input.poll()
 	var input := player_input.snapshot
 	
-	# --- LÓGICA DE TROCA DE STATS (DEV TOOL) ---
 	if input.change_stats_pressed and not _stats_list.is_empty():
 		_cycle_stats()
 	
@@ -186,13 +183,10 @@ func _physics_process(delta: float) -> void:
 		State.WALL_SLIDE: _apply_wall_slide(dt_ticks, input)
 		_: _apply_walk(dt_ticks, input)
 
+	# APLICA A FÍSICA NA ORDEM CORRETA (Gravidade -> Pulo -> Move)
+	_apply_gravity(dt_ticks)
 	_apply_jump_logic_cartwheel_aware()
 
-	if input.jump_released and velocity.y < 0.0:
-		if _wall_jump_lock_left <= 0.0:
-			velocity.y *= stats.jump_cut_multiplier
-
-	_apply_gravity(dt_ticks)
 	move_and_slide()
 	_post_move()
 	_play_animations()
@@ -200,22 +194,18 @@ func _physics_process(delta: float) -> void:
 	if debug_print:
 		print("St:", State.keys()[state], " Ice:", _is_floor_ice(), " VX:", int(velocity.x))
 
-# Função helper para trocar stats
 func _cycle_stats() -> void:
 	_current_stats_index = (_current_stats_index + 1) % _stats_list.size()
 	stats = _stats_list[_current_stats_index]
 	
-	# Reconfigura dependências que usam stats
 	player_input.configure_from_stats(stats)
 	floor_snap_length = stats.floor_snap_length
 	coyote_jump_timer.wait_time = stats.coyote_seconds
 	
-	# Feedback visual: Cor baseada no índice
-	# Usamos HSV para garantir cores vibrantes e distintas
 	if anim_sprite:
 		if _stats_list.size() > 1:
 			var hue = float(_current_stats_index) / float(_stats_list.size())
-			anim_sprite.modulate = Color.from_hsv(hue, 0.7, 1.0) # Saturação 0.7, Valor 1.0
+			anim_sprite.modulate = Color.from_hsv(hue, 0.7, 1.0)
 		else:
 			anim_sprite.modulate = Color.WHITE
 			
@@ -538,7 +528,9 @@ func _jump_now() -> void:
 	set_state(State.PULANDO)
 
 func _apply_gravity(dt_ticks: float) -> void:
-	if is_on_floor() or state == State.WALL_SLIDE: return 
+	# MANTEMOS APENAS A TRAVA DO WALL SLIDE, DEIXAMOS A GRAVIDADE EMPURRAR NO CHÃO
+	if state == State.WALL_SLIDE: return 
+	
 	if state == State.GLIDANDO:
 		velocity.y += (stats.gravity / stats.glide_gravity_divisor) * dt_ticks
 		velocity.y = minf(velocity.y, stats.max_glide_fall_speed)
@@ -553,7 +545,8 @@ func _apply_glide_open_pop() -> void:
 func _post_move() -> void:
 	if is_on_wall() and state != State.WALL_SLIDE: velocity.x = 0.0
 	if is_on_ceiling(): velocity.y = maxf(velocity.y, 0.0)
-	if is_on_floor() and state != State.DESLIZANDO: velocity.y = 0.0
+
+	# A LINHA velocity.y = 0.0 FOI REMOVIDA PARA O CHÃO REGISTRAR A COLISÃO DO SLIDE
 
 	var now_on_floor := is_on_floor()
 	if _was_on_floor and not now_on_floor and velocity.y >= 0.0 and state != State.PULANDO:
@@ -636,7 +629,12 @@ func _play_animations() -> void:
 		elif state == State.AGACHADO: _play_anim("crouch")
 		elif state == State.OLHANDO_CIMA: _play_anim("look_up")
 		elif absf(velocity.x) > 0.1: _play_anim("run" if _is_running else "walk")
-		else: _play_anim("idle")
+		else: 
+			# CHECAGEM DO LEDGE BALANCE AQUI
+			if _is_on_ledge():
+				_play_anim("ledge_balance")
+			else:
+				_play_anim("idle")
 	elif state == State.GLIDANDO: _play_anim("glide")
 	else:
 		if velocity.y < 0.0: _play_anim("wall_jump" if _wall_jump_lock_left > 0.0 else "jump_up")
@@ -648,7 +646,9 @@ func _play_anim(anim_name: String) -> void:
 	if anim_sprite.sprite_frames and anim_sprite.sprite_frames.has_animation(anim_id):
 		anim_sprite.play(anim_id)
 
-# --- HELPERS ESPECIAIS (GELO E PAREDE) ---
+# -----------------------------------------------------------------------------
+# SENSORES E SUPERFÍCIES (RESTAURO COM LEDGE BALANCE)
+# -----------------------------------------------------------------------------
 func _get_friction_to_apply() -> float:
 	if is_on_floor() and _is_floor_ice():
 		return stats.friction * 0.15 
@@ -660,8 +660,11 @@ func _get_acceleration_to_apply() -> float:
 	return stats.acceleration
 
 func _is_floor_ice() -> bool:
+	if not is_on_floor(): return false
+	
 	for i in get_slide_collision_count():
 		var col := get_slide_collision(i)
+		# Filtra colisões de "chão" (-0.5 na normal Y)
 		if col.get_normal().y < -0.5:
 			var collider = col.get_collider()
 			if collider is TileMapLayer:
@@ -670,6 +673,17 @@ func _is_floor_ice() -> bool:
 				if data and data.get_custom_data("is_ice"):
 					return true
 	return false
+
+# Verifica os Raycasts para a animação da beirada
+func _is_on_ledge() -> bool:
+	if floor_probe_l == null or floor_probe_r == null: 
+		return false
+	
+	var left_colliding = floor_probe_l.is_colliding()
+	var right_colliding = floor_probe_r.is_colliding()
+	
+	# Se apenas um pé está no chão e o outro está no ar, ele está na beirada
+	return (left_colliding and not right_colliding) or (right_colliding and not left_colliding)
 
 func _is_touching_world_wall() -> bool:
 	if not is_on_wall(): return false

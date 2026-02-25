@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/gritodobossa.wav-ed8d444943b2e1f1ed0f8809f1460273.sample"
+
+[deps]
+
+source_file="res://gritodobossa.wav"
+dest_files=[ "res://.import/gritodobossa.wav-ed8d444943b2e1f1ed0f8809f1460273.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

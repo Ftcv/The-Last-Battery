@@ -1,0 +1,56 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://FinalBoss1.gd" type="Script" id=1]
+[ext_resource path="res://chefao.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 16, 23 )
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "New Anim",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 24, 24 )
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 8, 7 )
+
+[node name="FinalBoss1" type="Node2D"]
+
+[node name="FinalBoss1" type="KinematicBody2D" parent="."]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FinalBoss1"]
+position = Vector2( 0, 7 )
+shape = SubResource( 1 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="FinalBoss1"]
+frames = SubResource( 2 )
+animation = "New Anim"
+
+[node name="areainimigo" type="Area2D" parent="FinalBoss1"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FinalBoss1/areainimigo"]
+position = Vector2( 0, 8 )
+shape = SubResource( 3 )
+
+[node name="levadano" type="Area2D" parent="FinalBoss1"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FinalBoss1/levadano"]
+position = Vector2( 0, -14 )
+shape = SubResource( 4 )
+[connection signal="area_entered" from="FinalBoss1/levadano" to="FinalBoss1" method="_on_levadano_area_entered"]

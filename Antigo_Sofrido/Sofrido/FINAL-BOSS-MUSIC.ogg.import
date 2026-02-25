@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/FINAL-BOSS-MUSIC.ogg-001675ed8890115af29cd3ff604bd800.oggstr"
+
+[deps]
+
+source_file="res://FINAL-BOSS-MUSIC.ogg"
+dest_files=[ "res://.import/FINAL-BOSS-MUSIC.ogg-001675ed8890115af29cd3ff604bd800.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

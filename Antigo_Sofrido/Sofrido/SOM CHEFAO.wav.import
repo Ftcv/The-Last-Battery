@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/SOM CHEFAO.wav-6f5df14d518858ddec886d9d5df618ac.sample"
+
+[deps]
+
+source_file="res://SOM CHEFAO.wav"
+dest_files=[ "res://.import/SOM CHEFAO.wav-6f5df14d518858ddec886d9d5df618ac.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

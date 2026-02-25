@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://InimigoVoador.gd" type="Script" id=1]
+[ext_resource path="res://pomodebosta2.png" type="Texture" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 7.271
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 4.02985, 1.95733 )
+
+[sub_resource type="CircleShape2D" id=4]
+radius = 7.519
+
+[node name="Inimigo Voador" type="Node2D"]
+position = Vector2( 365.738, 76.7872 )
+
+[node name="InimigoVoador" type="KinematicBody2D" parent="."]
+position = Vector2( -2.97919, -2.16494 )
+collision_layer = 4
+collision_mask = 7
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InimigoVoador"]
+position = Vector2( 0, -1 )
+shape = SubResource( 1 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="InimigoVoador"]
+frames = SubResource( 2 )
+
+[node name="Area2D" type="Area2D" parent="InimigoVoador"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InimigoVoador/Area2D"]
+position = Vector2( 0, -7 )
+shape = SubResource( 3 )
+
+[node name="areainimigo" type="Area2D" parent="InimigoVoador"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InimigoVoador/areainimigo"]
+position = Vector2( 0, -1 )
+shape = SubResource( 4 )
+[connection signal="area_entered" from="InimigoVoador/Area2D" to="InimigoVoador" method="_on_Area2D_area_entered"]

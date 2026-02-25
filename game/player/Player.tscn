@@ -325,7 +325,7 @@ stats = ExtResource("2_38lxl")
 texture_filter = 1
 position = Vector2(1, -16)
 sprite_frames = SubResource("SpriteFrames_8cf8e")
-animation = &"crouch"
+animation = &"ledge_balance"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1387931372]
 position = Vector2(1, -13)
@@ -348,3 +348,11 @@ position = Vector2(0, -15.25)
 shape = SubResource("RectangleShape2D_o4naa")
 
 [node name="Camera2D" parent="." unique_id=1448990731 instance=ExtResource("5_38lxl")]
+
+[node name="FloorProbeL" type="RayCast2D" parent="." unique_id=232003430]
+position = Vector2(-6, -1)
+target_position = Vector2(0, 10)
+
+[node name="FloorProbeR" type="RayCast2D" parent="." unique_id=633862886]
+position = Vector2(6, -1)
+target_position = Vector2(0, 10)

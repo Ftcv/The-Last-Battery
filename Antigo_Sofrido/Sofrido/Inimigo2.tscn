@@ -1,0 +1,48 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://InimigoScript.gd" type="Script" id=1]
+[ext_resource path="res://Inimigochantily.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 11, 15.9062 )
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 12, 20.8154 )
+
+[node name="Inimigo2" type="Node2D"]
+
+[node name="Inimigo2" type="KinematicBody2D" parent="."]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+velocidade = 150
+
+[node name="RayCast2D" type="RayCast2D" parent="Inimigo2"]
+position = Vector2( -11, 1 )
+enabled = true
+cast_to = Vector2( 0, 17 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Inimigo2"]
+shape = SubResource( 1 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="Inimigo2"]
+frames = SubResource( 2 )
+
+[node name="areainimigo" type="Area2D" parent="Inimigo2"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Inimigo2/areainimigo"]
+visible = false
+shape = SubResource( 3 )

@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/FASE2-MUSICA.ogg-31924c5e127afa31ecd3ff86d285ccca.oggstr"
+
+[deps]
+
+source_file="res://FASE2-MUSICA.ogg"
+dest_files=[ "res://.import/FASE2-MUSICA.ogg-31924c5e127afa31ecd3ff86d285ccca.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

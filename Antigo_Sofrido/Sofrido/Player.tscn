@@ -1,0 +1,87 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://Sprite-0001-Player.png" type="Texture" id=1]
+[ext_resource path="res://PlayerScript.gd" type="Script" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 12, 14 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 12, 15 )
+
+[sub_resource type="SpriteFrames" id=3]
+animations = [ {
+"frames": [ ExtResource( 1 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 12, 3 )
+
+[sub_resource type="Animation" id=5]
+resource_name = "BOBADO"
+
+[sub_resource type="Animation" id=6]
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+
+[node name="Player" type="Node2D"]
+
+[node name="PlayerBody2D" type="KinematicBody2D" parent="." groups=[
+"Player",
+]]
+collision_layer = 2
+collision_mask = 7
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="areamachuca" type="Area2D" parent="PlayerBody2D"]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerBody2D/areamachuca"]
+position = Vector2( 0, -1 )
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerBody2D"]
+visible = false
+shape = SubResource( 2 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="PlayerBody2D"]
+frames = SubResource( 3 )
+
+[node name="Camera2D" type="Camera2D" parent="PlayerBody2D"]
+current = true
+
+[node name="areadadano" type="Area2D" parent="PlayerBody2D"]
+visible = false
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerBody2D/areadadano"]
+position = Vector2( 0, 14 )
+shape = SubResource( 4 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PlayerBody2D"]
+autoplay = "BOBADO"
+anims/BOBADO = SubResource( 5 )
+anims/DANADO = SubResource( 6 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="PlayerBody2D"]
+[connection signal="area_entered" from="PlayerBody2D/areamachuca" to="PlayerBody2D" method="_on_areamachuca_area_entered"]
+[connection signal="animation_finished" from="PlayerBody2D/AnimationPlayer" to="PlayerBody2D" method="_on_AnimationPlayer_animation_finished"]
