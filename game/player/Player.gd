@@ -46,8 +46,8 @@ enum State {
 @onready var attack_hitbox: Area2D = get_node_or_null("AttackHitbox")
 
 # Sensores para a borda (Ledge Balance)
-@onready var floor_probe_l: RayCast2D = get_node_or_null("FloorProbeL")
-@onready var floor_probe_r: RayCast2D = get_node_or_null("FloorProbeR")
+@onready var floor_probe_l: ShapeCast2D = get_node_or_null("FloorProbeL")
+@onready var floor_probe_r: ShapeCast2D = get_node_or_null("FloorProbeR")
 
 # -----------------------------------------------------------------------------
 # VARIÁVEIS DE ESTADO
@@ -674,16 +674,23 @@ func _is_floor_ice() -> bool:
 					return true
 	return false
 
-# Verifica os Raycasts para a animação da beirada
+# Verifica os ShapeCast2D para a animação da beirada
+# Verifica os ShapeCasts para a animação da beirada
 func _is_on_ledge() -> bool:
 	if floor_probe_l == null or floor_probe_r == null: 
 		return false
 	
+	# No ShapeCast2D, a função de atualização forçada tem outro nome
+	floor_probe_l.force_shapecast_update()
+	floor_probe_r.force_shapecast_update()
+	
 	var left_colliding = floor_probe_l.is_colliding()
 	var right_colliding = floor_probe_r.is_colliding()
 	
-	# Se apenas um pé está no chão e o outro está no ar, ele está na beirada
+# Retorna true se apenas UM dos sensores estiver tocando o chão
 	return (left_colliding and not right_colliding) or (right_colliding and not left_colliding)
+		
+	return false
 
 func _is_touching_world_wall() -> bool:
 	if not is_on_wall(): return false

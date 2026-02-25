@@ -1,4 +1,3 @@
 res://default_env.tres
 res://game/player/Player.tscn
 res://game/player/Player.gd
-res://game/levels/tile_map_layer_demo.tscn

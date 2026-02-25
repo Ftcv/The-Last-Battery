@@ -309,9 +309,16 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_38lxl"]
+size = Vector2(14, 25)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o4naa"]
 size = Vector2(12, 29.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lg056"]
+size = Vector2(2, 2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8cf8e"]
+size = Vector2(2, 2)
 
 [node name="Player" type="CharacterBody2D" unique_id=1339262225]
 collision_layer = 2
@@ -323,12 +330,12 @@ stats = ExtResource("2_38lxl")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2076672150]
 texture_filter = 1
-position = Vector2(1, -16)
+position = Vector2(1, -17)
 sprite_frames = SubResource("SpriteFrames_8cf8e")
-animation = &"ledge_balance"
+animation = &"run"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1387931372]
-position = Vector2(1, -13)
+position = Vector2(0, -15.5)
 shape = SubResource("RectangleShape2D_38lxl")
 
 [node name="CoyoteTimer" type="Timer" parent="." unique_id=1229478610]
@@ -349,10 +356,12 @@ shape = SubResource("RectangleShape2D_o4naa")
 
 [node name="Camera2D" parent="." unique_id=1448990731 instance=ExtResource("5_38lxl")]
 
-[node name="FloorProbeL" type="RayCast2D" parent="." unique_id=232003430]
+[node name="FloorProbeL" type="ShapeCast2D" parent="." unique_id=2072296303]
 position = Vector2(-6, -1)
+shape = SubResource("RectangleShape2D_lg056")
 target_position = Vector2(0, 10)
 
-[node name="FloorProbeR" type="RayCast2D" parent="." unique_id=633862886]
+[node name="FloorProbeR" type="ShapeCast2D" parent="." unique_id=711489246]
 position = Vector2(6, -1)
+shape = SubResource("RectangleShape2D_8cf8e")
 target_position = Vector2(0, 10)
